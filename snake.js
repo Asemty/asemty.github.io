@@ -130,3 +130,140 @@
 		}
 	}	
 }
+
+class Template extends Part{
+	constructor(){
+		super("Template");
+	}
+	keyPress(evt){
+		super.keyPress(evt);
+		switch(evt.keyCode) {
+			case 38:
+				up();
+				break;
+			case 40:
+				down();
+				break;
+			case 37:
+				left();
+				break;
+			case 39:
+				right();
+				break;
+		}
+	}
+	start(){
+	}
+	update(){
+		contex.fillStyle="#111111";
+		contex.fillRect(0,0,canvas.width,canvas.height);
+	}
+}
+
+class LightCycle extends Part{
+	constructor(){
+		super("LightCycle");
+	}
+	keyPress(evt){
+		super.keyPress(evt);
+		switch(evt.keyCode) {
+			case 38:
+				this.player.dir=0;
+				break;
+			case 40:
+				this.player.dir=1;
+				break;
+			case 37:
+				this.player.dir=2;
+				break;
+			case 39:
+				this.player.dir=3;
+				break;
+		}
+	}
+	start(){
+		this.counter=-100;
+		this.maxCounter=2;
+		this.width=120;
+		this.height=160;
+		this.cellSize=canvas.width/this.width;
+		this.map=[];
+		for(var i=0;i<this.width;i++){
+			this.map[i]=[];
+			for(var j=0;j<this.height;j++){
+				this.map[i][j]=0;
+			}
+		}
+		this.player={	x: Math.floor(Math.random()*this.width/8*6+this.width/8),
+						y: Math.floor(Math.random()*this.height/8*6+this.height/8),
+						color: 7,
+						dir: Math.floor(Math.random()*4)};
+		var enemyNumber=prompt("Количество противников (0-9)");
+		while(true){
+			if(+enemyNumber>=0 && +enemyNumber<=9){
+				break;
+			}else{
+				enemyNumber=prompt("Неверный ввод! Попробуйте ещё раз.\nКоличество противников (0-9)");
+			}
+		}
+		this.enemy=[];
+		for(var i=0;i<enemyNumber;i++){
+			this.enemy[i]={	x: Math.floor(Math.random()*this.width/8*6+this.width/8),
+							y: Math.floor(Math.random()*this.height/8*6+this.height/8),
+							color: Math.floor(Math.random()*6)+1,
+							dir: Math.floor(Math.random()*4),
+							isLive: true};
+		}
+	}
+	update(){
+		contex.fillStyle="#111111";
+		contex.fillRect(0,0,canvas.width,canvas.height);
+		var lastColor=0;
+		for(var i=0;i<this.width;i++){
+			for(var j=0;j<this.height;j++){
+				if(this.map[i][j]!=0){
+					if(lastColor!= this.map[i][j]){
+						contex.fillStyle=this.getSimpleColor(this.map[i][j]);
+						lastColor=this.map[i][j];
+					}
+					contex.fillRect(this.cellSize*i,this.cellSize*j,this.cellSize,this.cellSize);
+				}
+			}
+		}
+		contex.fillStyle=this.getSimpleColor(7);
+		contex.fillRect(this.cellSize*this.player.x,this.cellSize*this.player.y,this.cellSize,this.cellSize);
+		if(this.counter<0){
+			contex.strokeStyle="white";
+			contex.lineWidth=this.cellSize/2;
+			contex.strokeRect(this.cellSize*this.player.x+this.counter,this.cellSize*this.player.y+this.counter,this.cellSize-this.counter*2,this.cellSize-this.counter*2);
+		}
+		for(var i=0;i<this.enemy.length;i++){
+			contex.fillStyle=this.getSimpleColor(this.enemy[i].color);
+			contex.fillRect(this.cellSize*this.enemy[i].x,this.cellSize*this.enemy[i].y,this.cellSize,this.cellSize);
+		}
+		this.counter++
+		if(this.counter>=this.maxCounter){
+			this.counter=0;
+			this.map[this.player.x][this.player.y]=this.player.color;
+			this.player.x+=this.player.dir==2?-1:this.player.dir==3?1:0;
+			this.player.y+=this.player.dir==0?-1:this.player.dir==1?1:0;
+			if(this.player.x<0 || this.player.y<0 || this.player.x>=this.width || this.player.y>=this.height || this.map[this.player.x][this.player.y]!=0){
+						alert("Вы погибли в светомотокатастрофе...")
+						this.start();
+					}
+			for(var i=0;i<this.enemy.length;i++){
+				if(this.enemy[i].isLive==true){
+					this.map[this.enemy[i].x][this.enemy[i].y]=this.enemy[i].color;
+					this.enemy[i].x+=this.enemy[i].dir==2?-1:this.enemy[i].dir==3?1:0;
+					this.enemy[i].y+=this.enemy[i].dir==0?-1:this.enemy[i].dir==1?1:0;
+					if(this.enemy[i].x<0 || this.enemy[i].y<0 || this.enemy[i].x>=this.width || this.enemy[i].y>=this.height || this.map[this.enemy[i].x][this.enemy[i].y]!=0){
+						this.enemy[i].isLive=false;
+					}
+				}
+			}
+		}
+	}
+	getSimpleColor(col){
+		return "#"+((col & 4)!=0?"ff":"00")+((col & 2)!=0?"ff":"00")+((col & 1)!=0?"ff":"00");
+	}
+}

@@ -2,7 +2,7 @@
 	constructor(){
 		this.games=[];
 		this.games.unshift(new Snake());
-		this.games.unshift(new Snake());
+		this.games.unshift(new LightCycle());
 		this.games.unshift(new Snake());
 		this.currentMenuItem=0;
 	}
@@ -80,6 +80,7 @@ class Part{
 		}
 		if(evt.keyCode == 13 && this.pause){//enter
 			curentPart=menu;
+			pause=false;
 		}
 	}
 	upd(){
