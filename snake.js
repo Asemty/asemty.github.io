@@ -252,15 +252,35 @@ class LightCycle extends Part{
 						this.start();
 					}
 			for(var i=0;i<this.enemy.length;i++){
-				if(this.enemy[i].isLive==true){
+				if(this.enemy[i].isLive){
+					this.tryTurn(this.enemy[i]);
 					this.map[this.enemy[i].x][this.enemy[i].y]=this.enemy[i].color;
 					this.enemy[i].x+=this.enemy[i].dir==2?-1:this.enemy[i].dir==3?1:0;
 					this.enemy[i].y+=this.enemy[i].dir==0?-1:this.enemy[i].dir==1?1:0;
 					if(this.enemy[i].x<0 || this.enemy[i].y<0 || this.enemy[i].x>=this.width || this.enemy[i].y>=this.height || this.map[this.enemy[i].x][this.enemy[i].y]!=0){
 						this.enemy[i].isLive=false;
+						for(var j=0;j<this.enemy.length;j++){
+							if(this.enemy[j].isLive) break;
+							if(j==this.enemy.length-1){
+								alert("Поздравляю, вы победили!")
+								this.start();
+							}
+						}
 					}
 				}
 			}
+		}
+	}
+	tryTurn(cycle){
+		for(var i=1;i<11;i++){
+			var nx = (cycle.dir==2?-1:cycle.dir==3?1:0)*i+cycle.x;
+			var ny = (cycle.dir==0?-1:cycle.dir==1?1:0)*i+cycle.y;
+			if(nx<0 || ny<0 || nx>=this.width || ny>=this.height || this.map[nx][ny]!=0){
+					break;
+			}
+		}
+		if((i<7 && Math.random()<0.3) || i<2){
+			cycle.dir = (cycle.dir>1?(cycle.y>this.height/2?0:1):(cycle.x>this.width/2?0:1))+(cycle.dir>1?0:2);
 		}
 	}
 	getSimpleColor(col){
