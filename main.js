@@ -1,9 +1,9 @@
 ﻿class Menu{
 	constructor(){
 		this.games=[];
-		this.games.unshift(new Snake());
-		this.games.unshift(new LightCycle());
-		this.games.unshift(new Snake());
+		this.games.push(new Snake());
+		this.games.push(new LightCycle());
+		this.games.push(new Tetris());
 		this.currentMenuItem=0;
 	}
 	keyPress(evt){
@@ -80,7 +80,7 @@ class Part{
 		}
 		if(evt.keyCode == 13 && this.pause){//enter
 			curentPart=menu;
-			pause=false;
+			this.pause=false;
 		}
 	}
 	upd(){

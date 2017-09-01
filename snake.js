@@ -163,6 +163,7 @@ class Template extends Part{
 class LightCycle extends Part{
 	constructor(){
 		super("LightCycle");
+		this.cycleSize=1.5;
 	}
 	keyPress(evt){
 		super.keyPress(evt);
@@ -230,8 +231,26 @@ class LightCycle extends Part{
 				}
 			}
 		}
-		contex.fillStyle=this.getSimpleColor(7);
-		contex.fillRect(this.cellSize*this.player.x,this.cellSize*this.player.y,this.cellSize,this.cellSize);
+		contex.fillStyle="white";
+		contex.beginPath();
+		switch(this.player.dir){
+			case 0: var angleFromDir = Math.PI/2*2;
+				break;
+			case 1: var angleFromDir = Math.PI/2*0;
+				break;
+			case 2: var angleFromDir = Math.PI/2*1;
+				break;
+			case 3: var angleFromDir = Math.PI/2*3;
+				break;
+		}
+		contex.moveTo(	Math.cos(Math.PI/2+angleFromDir)*this.cellSize*this.cycleSize+this.cellSize*this.player.x+this.cellSize/2,
+						Math.sin(Math.PI/2+angleFromDir)*this.cellSize*this.cycleSize+this.cellSize*this.player.y+this.cellSize/2);
+		contex.lineTo(	Math.cos(-Math.PI/3+angleFromDir)*this.cellSize*this.cycleSize+this.cellSize*this.player.x+this.cellSize/2,
+						Math.sin(-Math.PI/3+angleFromDir)*this.cellSize*this.cycleSize+this.cellSize*this.player.y+this.cellSize/2);
+		contex.lineTo(	Math.cos(-Math.PI/3*2+angleFromDir)*this.cellSize*this.cycleSize+this.cellSize*this.player.x+this.cellSize/2,
+						Math.sin(-Math.PI/3*2+angleFromDir)*this.cellSize*this.cycleSize+this.cellSize*this.player.y+this.cellSize/2);
+		contex.closePath();
+		contex.fill();
 		if(this.counter<0){
 			contex.strokeStyle="white";
 			contex.lineWidth=this.cellSize/2;
@@ -239,7 +258,25 @@ class LightCycle extends Part{
 		}
 		for(var i=0;i<this.enemy.length;i++){
 			contex.fillStyle=this.getSimpleColor(this.enemy[i].color);
-			contex.fillRect(this.cellSize*this.enemy[i].x,this.cellSize*this.enemy[i].y,this.cellSize,this.cellSize);
+			contex.beginPath();
+			switch(this.enemy[i].dir){
+				case 0: var angleFromDir = Math.PI/2*2;
+					break;
+				case 1: var angleFromDir = Math.PI/2*0;
+					break;
+				case 2: var angleFromDir = Math.PI/2*1;
+					break;
+				case 3: var angleFromDir = Math.PI/2*3;
+					break;
+			}
+			contex.moveTo(	Math.cos(Math.PI/2+angleFromDir)*this.cellSize*this.cycleSize+this.cellSize*this.enemy[i].x+this.cellSize/2,
+							Math.sin(Math.PI/2+angleFromDir)*this.cellSize*this.cycleSize+this.cellSize*this.enemy[i].y+this.cellSize/2);
+			contex.lineTo(	Math.cos(-Math.PI/3+angleFromDir)*this.cellSize*this.cycleSize+this.cellSize*this.enemy[i].x+this.cellSize/2,
+							Math.sin(-Math.PI/3+angleFromDir)*this.cellSize*this.cycleSize+this.cellSize*this.enemy[i].y+this.cellSize/2);
+			contex.lineTo(	Math.cos(-Math.PI/3*2+angleFromDir)*this.cellSize*this.cycleSize+this.cellSize*this.enemy[i].x+this.cellSize/2,
+							Math.sin(-Math.PI/3*2+angleFromDir)*this.cellSize*this.cycleSize+this.cellSize*this.enemy[i].y+this.cellSize/2);
+			contex.closePath();
+			contex.fill();
 		}
 		this.counter++
 		if(this.counter>=this.maxCounter){
@@ -287,3 +324,256 @@ class LightCycle extends Part{
 		return "#"+((col & 4)!=0?"ff":"00")+((col & 2)!=0?"ff":"00")+((col & 1)!=0?"ff":"00");
 	}
 }
+
+class Tetris extends Part{
+	constructor(){
+		super("Tetris");
+		this.figures = [
+		[	[[0,0],[0,-1],[1,0],[1,-1]]],//O
+		[	[[0,0],[0,-1],[0,-2],[1,0]],//L
+			[[-1,0],[0,0],[1,0],[1,-1]],
+			[[1,0],[1,-1],[1,-2],[0,-2]],
+			[[-1,0],[-1,-1],[0,-1],[1,-1]]],
+		[	[[0,0],[1,0],[1,-1],[1,-2]],//J
+			[[-1,-1],[0,-1],[1,-1],[1,0]],
+			[[0,0],[0,-1],[0,-2],[1,-2]],
+			[[-1,-1],[-1,0],[0,0],[1,0]]],
+		[	[[0,0],[0,-1],[1,-1],[1,-2]],//Z
+			[[-1,-1],[0,-1],[0,0],[1,0]]],
+		[	[[0,-2],[0,-1],[1,-1],[1,0]],//S
+			[[-1,0],[0,0],[0,-1],[1,-1]]],
+		[	[[0,0],[0,-1],[0,-2],[0,-3]],//I
+			[[-1,0],[0,0],[1,0],[2,0]]],
+		[	[[0,0],[0,-1],[0,-2],[1,-1]],//T
+			[[-1,0],[0, 0],[1,0],[0,-1]],
+			[[0,0],[0,-1],[0,-2],[-1,-1]],
+			[[-1,-1],[0,-1],[1,-1],[0,0]]]];
+		this.colors = ["#bbb","#00b","#0b0","#0bb","#b0b","#b00","#bb0"];
+	}
+	keyPress(evt){
+		super.keyPress(evt);
+		switch(evt.keyCode) {
+			case 38:
+				this.up();
+				break;
+			case 40:
+				this.down();
+				break;
+			case 37:
+				this.left();
+				break;
+			case 39:
+				this.right();
+				break;
+		}
+	}
+	start(){
+		this.counter=-100;
+		this.maxCounter=60;
+		this.lineSmasher=0;
+		this.width=10;
+		this.height=20;
+		this.cellSize=canvas.height/this.height;
+		this.offset=4;
+		this.bottle =[];
+		this.figure={type: -1, x:-1, y:-1, rot:0};
+		this.newFigure=Math.floor(Math.random()*this.figures.length);
+		this.createFigures();
+		this.score=0;
+		this.lines=0;
+		this.fullLines=[];
+		for(var i=0;i<this.width;i++){
+			this.bottle[i]=[];
+			for(var j=0;j<this.height;j++){
+				this.bottle[i][j]=0;
+			}
+		}
+	}
+	update(){
+		contex.fillStyle="#111";
+		contex.fillRect(0,0,canvas.width,canvas.height);
+		for(var i=0;i<this.width;i++){
+			for(var j=0;j<this.height;j++){
+				if(this.bottle[i][j]==0){
+					contex.fillStyle="#232";
+				}else{
+					contex.fillStyle=this.bottle[i][j];
+				}
+				this.drawCell(i,j);
+			}
+		}
+		if(this.lineSmasher==0){
+			this.counter++;
+		}else{
+			this.lineSmasher--;
+			contex.fillStyle="#fff";
+			for(var i=0;i<this.fullLines.length;i++){
+				contex.fillRect(0,this.cellSize*this.fullLines[i]+this.offset,this.cellSize*this.width*(1-this.lineSmasher/this.maxCounter),this.cellSize-this.offset/2);
+				if(this.lineSmasher == 0){
+					this.deleteLine(this.fullLines[i]);
+					this.lines++;
+					this.score+=100*this.fullLines.length;
+				}
+			}
+			if(this.lineSmasher == 0){
+				if(Math.floor((this.lines-this.fullLines.length)/30)!=Math.floor(this.lines/30)){
+					this.speedUp();
+				}
+				this.fullLines=[];
+			}
+		}
+		if(this.counter>this.maxCounter){
+			this.counter=0;
+			this.moveDown();
+		}
+		contex.fillStyle="#fff";
+		contex.font="bold 15px arial";
+		contex.fillText("Lines: " + this.lines,this.width*this.cellSize+6,this.cellSize);
+		contex.fillText("Score: " + this.score,this.width*this.cellSize+6,this.cellSize*2);
+		
+		if(this.counter<0){
+			contex.fillStyle="#ffd";
+			contex.font="bold 70px arial";
+			contex.fillText("Start!",this.width/3*this.cellSize,this.cellSize*this.height/2);
+		}
+		if(this.figure.type!=-1){
+			for(var i=0;i<this.figures[this.figure.type][this.figure.rot].length;i++){
+				contex.fillStyle=this.colors[this.figure.type];
+				this.drawCell(this.figure.x+this.figures[this.figure.type][this.figure.rot][i][0],this.figure.y+this.figures[this.figure.type][this.figure.rot][i][1]);
+			}
+		}
+		if(this.newFigure!=-1){
+			for(var i=0;i<this.figures[this.newFigure][0].length;i++){
+				contex.fillStyle=this.colors[this.newFigure];
+				this.drawCell(11.5+this.figures[this.newFigure][0][i][0],18+this.figures[this.newFigure][0][i][1]);
+			}
+		}
+	}
+	drawCell(xx,yy){
+		contex.fillRect(this.cellSize*xx+this.offset,this.cellSize*yy+this.offset,this.cellSize-this.offset/2,this.cellSize-this.offset/2);
+	}
+	createFigures(){
+		this.figure.type=this.newFigure;
+		this.figure.x=5;
+		this.figure.y=1;
+		this.figure.rot=0;
+		this.newFigure=Math.floor(Math.random()*this.figures.length);
+	}
+	moveDown(){                                 
+		if(this.figure.type!=-1){
+		var canMoveDown=true;
+			for(var i=0;i<this.figures[this.figure.type][this.figure.rot].length;i++){
+				if(this.figure.y+this.figures[this.figure.type][this.figure.rot][i][1]+1>=0){
+					canMoveDown&=this.figure.y+1!=this.height 
+					&& this.bottle	[this.figure.x+this.figures[this.figure.type][this.figure.rot][i][0]]
+									[this.figure.y+this.figures[this.figure.type][this.figure.rot][i][1]+1] == 0;
+				}
+			}
+			if(canMoveDown){
+				this.figure.y++;
+			}else{
+				for(var i=0;i<this.figures[this.figure.type][this.figure.rot].length;i++){
+					if(this.figure.y+this.figures[this.figure.type][this.figure.rot][i][1]>=0){
+						this.bottle	[this.figure.x+this.figures[this.figure.type][this.figure.rot][i][0]]
+								[this.figure.y+this.figures[this.figure.type][this.figure.rot][i][1]] = this.colors[this.figure.type];
+						
+					}else{
+						alert("Мне жаль,вы проиграли.\nВаш счёт: " + this.score + "\nУдаленно " + this.lines + " строк");
+						this.start();
+						return;
+					}
+				}
+				this.linesCheck();
+				this.createFigures();
+			}
+		}
+	}
+	shear(side){
+		if(this.figure.type!=-1){
+			var canShear=true;
+			for(var i=0;i<this.figures[this.figure.type][this.figure.rot].length;i++){
+				if(this.figure.y+this.figures[this.figure.type][this.figure.rot][i][1]>=0){
+					canShear &=this.figure.x+this.figures[this.figure.type][this.figure.rot][i][0]+side>=0 
+							&& this.figure.x+this.figures[this.figure.type][this.figure.rot][i][0]+side<this.width
+							&& this.bottle	[this.figure.x+this.figures[this.figure.type][this.figure.rot][i][0] + side]
+											[this.figure.y+this.figures[this.figure.type][this.figure.rot][i][1]] == 0;
+				}
+			}
+			if(canShear){
+				this.figure.x+=side;
+			}
+		}
+	}
+	rotate(){
+		if(this.figure.type!=-1){
+			var newRotate=this.figure.rot==this.figures[this.figure.type].length-1?0:this.figure.rot+1;
+			var canRotate=true;
+			for(var i=0;i<this.figures[this.figure.type][newRotate].length;i++){
+				if(this.figure.y+this.figures[this.figure.type][newRotate][i][1]>=0){
+					canRotate &=this.figure.x+this.figures[this.figure.type][newRotate][i][0]>=0 
+							&& this.figure.x+this.figures[this.figure.type][newRotate][i][0]<this.width
+							&& this.bottle	[this.figure.x+this.figures[this.figure.type][newRotate][i][0]]
+											[this.figure.y+this.figures[this.figure.type][newRotate][i][1]] == 0;
+				}
+			}
+			if(canRotate){
+				this.figure.rot=newRotate;
+			}
+		}
+	}
+	linesCheck(){
+		if(this.fullLines.length == 0){
+			for(var i=this.height-1;i>=0;i--){
+				for(var j=0;j<this.width;j++){
+					if(this.bottle[j][i] == 0) break;
+				}
+				if(j==this.width)this.fullLines.unshift(i);
+			}
+			if(this.fullLines.length>0){
+				this.lineSmasher=this.maxCounter;
+			}
+		}
+		
+	}
+	deleteLine(n){
+		for(var j=n;j>0;j--){
+			for(var i=0;i<this.width;i++){
+				this.bottle[i][j]=this.bottle[i][j-1];
+			}
+		}
+		for(var i=0;i<this.width;i++){
+				this.bottle[i][0]=0;
+			}
+	}
+	speedUp(){
+		this.maxCounter-=5;
+		var col='#'+Math.round(Math.random()*7+3).toString(16)+Math.round(Math.random()*7+3).toString(16)+Math.round(Math.random()*7+3).toString(16);
+		for(var i=0;i<this.width;i++){
+			for(var j=0;j<this.height;j++){
+				if(this.bottle[i][j]!=0){
+					this.bottle[i][j]=col;
+				}
+			}
+		}
+	}
+	up(){
+	if(this.counter>=0 && this.lineSmasher==0){
+			this.rotate();
+		}}
+	down(){
+		if(this.counter>=0 && this.lineSmasher==0){
+			this.counter=0;
+			this.moveDown();
+		}
+	}
+	left(){
+		if(this.counter>=0 && this.lineSmasher==0){
+			this.shear(-1);
+		}
+	}
+	right(){
+		if(this.counter>=0 && this.lineSmasher==0){
+			this.shear(1);
+		}
+	}
+	}
