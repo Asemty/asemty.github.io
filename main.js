@@ -4,6 +4,7 @@
 		this.games.push(new Snake());
 		this.games.push(new LightCycle());
 		this.games.push(new Tetris());
+		this.games.push(new Genetic());
 		this.currentMenuItem=0;
 	}
 	keyPress(evt){
