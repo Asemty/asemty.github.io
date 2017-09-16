@@ -1,0 +1,1 @@
+standartGun = {maxBullet: 3, }

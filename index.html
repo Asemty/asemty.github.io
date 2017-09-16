@@ -1,12 +1,13 @@
-<canvas id="gc" width="600" height="800"></canvas>
-<script src="main.js"></script>
-<script src="chapter1.js"></script>
-<script src="chapter2.js"></script>
+<canvas id="gc" width="1366" height="768"></canvas>
+<script src="map/lvl1.js"></script>
+<script src="src/main.js"></script>
 <script>
 window.onload=function() {
     canvas=document.getElementById("gc");
-    contex=canvas.getContext("2d");
-    document.addEventListener("keydown",keyPress);
+    ctx=canvas.getContext("2d");
+    //document.addEventListener("keydown",keyPress);
+	document.addEventListener('keydown', function(ev) { return keyPress(ev, true);  }, false);
+	document.addEventListener('keyup',   function(ev) { return keyPress(ev, false); }, false);
 	start();
     setInterval(update,1000/45);
 }
