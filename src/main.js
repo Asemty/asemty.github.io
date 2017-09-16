@@ -64,6 +64,11 @@ function updatePlayer(){
 		}
 		player.bullets = newBullets;
 	}
+	player.gunCounter++;
+	if(player.bPressed && player.gun().auto && (!player.gun().delay || player.gun().delay < player.gunCounter)){
+			player.shot();
+			player.gunCounter = 0;
+	}
 }
 function updateEntity(entity) {
     var wasleft    = entity.dx  < 0,
@@ -89,8 +94,6 @@ function updateEntity(entity) {
       entity.ddy = entity.ddy - IMPULSE; // an instant big force impulse
       entity.canJump = false;
     }
-  
-    
     entity.dx = bound(entity.dx + entity.ddx, -MAXDX, MAXDX);
     entity.dy = bound(entity.dy + entity.ddy, -MAXDY, MAXDY);
   
@@ -200,12 +203,12 @@ function renderPlayer(){
 	if(player){
 		ctx.fillStyle = "#fff";
 		ctx.font="bold 3px arial";
-		ctx.fillText("WASD или стрелки-движение, Z/J-прыжок, H/X-полёт(дебаг, нужно нажимать)",0,3);
+		ctx.fillText("WASD или стрелки-движение, Z/J-прыжок, H/X-стрельба, F/ENTER-циклическая смена оружия",0,3);
 		if(player.dx < 0) {
-			player.lookLeft = true;
+			player.lookleft = true;
 			player.setAnim("runAnim");
 		} else if(player.dx > 0){
-			player.lookLeft = false;
+			player.lookleft = false;
 		} else {
 			player.setAnim("standAnim");
 		}
@@ -218,10 +221,11 @@ function renderPlayer(){
 		} else {
 			player.setAnim("standAnim");
 		}
-		drawAnim(player, player.x - camera.x, player.y - camera.y, player.width, player.height, player.lookLeft);
+		drawAnim(player, player.x - camera.x, player.y - camera.y, player.width, player.height, player.lookleft);
 		if(player.bullets){
 			for(var i=0;i < player.bullets.length; i++){
-				drawImg(bulletInfo.img, 1, 1, 6, 6, player.bullets[i].x - camera.x, player.bullets[i].y - camera.y, 6 , 6);
+				var b = player.bullets[i];
+				drawImg(bulletInfo.img, b.ox, b.oy, b.ov, b.oh, player.bullets[i].x - camera.x, player.bullets[i].y - camera.y, b.ov, b.oh, b.h < 0, b.v < 0);
 			}
 		}
 	}
@@ -277,6 +281,30 @@ function setupPlayer(entity, obj){
 			this.currentAnimation.counter = 0;
 		}
 	};
+	entity.gunCounter = 0;
+	entity.currentGun = 0;
+	entity.shot = function(){
+		var h = 0, v = 0;
+		if(!player.lookup && !player.lookdown){
+			h = player.lookleft?-1:1;
+		}else{
+			if(player.lookup){
+				v = -1;
+			}else if(player.lookdown){
+				v = 1;
+			}
+			if(player.left){
+				h = -1;
+			}else if(player.right){
+				h = 1;
+			}
+		}
+		weapons[this.currentGun].shot(player,h,v);
+		this.gunCounter = 0;
+	}
+	entity.gun = function(){
+		return weapons[this.currentGun];
+	}
 }
 function getMap(name){return TileMaps[name]};
 function t2p(t){return t*TILE;}//номер тайла в координаты
@@ -291,10 +319,14 @@ function bound(x, min, max) {// загнать число в рамки
   
 function up(p){
 	if(player){
-		player.look
+		player.lookup = p
 	}
 }
-function down(p){}
+function down(p){
+if(player){
+		player.lookdown = p
+	}
+}
 function left(p){
 	if(player){
 		player.left = p;
@@ -313,30 +345,19 @@ function aButton(p){
 function bButton(p){
 		if(player && !player.bullets){
 			player.bullets=[];
-			//player.shot();
 		}
-		if(player.bullets.length < 9 && p){
-			player.bullets.push({x: player.x + 1, y: player.y + 1, sx: player.x + 1, sy: player.y + 1, sphase: player.bullets.length*Math.PI, upd: function(){
-			this.x +=(this.x - this.sx)/20+2; 
-			this.y = Math.sin((this.x-this.sx)/25 + this.sphase) * 3 + this.sy;
-			if(this.x > camera.x + canvas.width / camera.scale){
-				this.isDead = true;
-			}
-			}});
-			player.bullets.push({x: player.x + 1, y: player.y + 1, sx: player.x + 1, sy: player.y + 1, sphase: player.bullets.length*Math.PI, upd: function(){
-			this.x += (this.x - this.sx)/20+2; 
-			this.y = Math.sin((this.x-this.sx)/25 + this.sphase) * 3 + this.sy;
-			if(this.x > camera.x + canvas.width / camera.scale){
-				this.isDead = true;
-			}
-			}});
+		if(p){
+			player.shot();
 		}
+		player.bPressed = p;
 }
 function startButton(p){
-	if(p)
-	if(player.dead)
-	player.dead =! player.dead;
-	else player.dead=true;
+	if(p){
+		player.currentGun++;
+		if(player.currentGun == weapons.length){
+			player.currentGun = 0;
+		}
+	}
 }
 
 function drawImg(img,ox,oy,ow,oh,cx,cy,cw,ch,fh,fv){
