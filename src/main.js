@@ -6,6 +6,10 @@
 	bulletInfo = {img: new Image(), width: 8, height: 8};
 	playerInfo.img.src = "images/player.png";
 	bulletInfo.img.src = "images/bullet.png";
+	temp = {};
+	temp.hudimg= new Image();
+	temp.hudimg.src = "images/hud.png";
+	temp.live = 2;
 	setupMap("lvl1");
 	GRAVITY  = 1/5;
 	MAXDX    = 2;      // default max horizontal speed (15 tiles per second)
@@ -52,7 +56,7 @@ function updatePlayer(){
 		player.dx += MAXDX
 	}
 	if(player.y >= canvas.height/camera.scale){
-		player.y = -10;
+		player.dead = true;
 	}
 	if(player.bullets){
 		var newBullets = [];
@@ -68,6 +72,22 @@ function updatePlayer(){
 	if(player.bPressed && player.gun().auto && (!player.gun().delay || player.gun().delay < player.gunCounter)){
 			player.shot();
 			player.gunCounter = 0;
+	}
+	if(player.dead){
+		player.deadTimer++;
+		if(player.deadTimer > 30){
+			player.deadTimer = 0;
+			if(temp.live>0){
+				temp.live--;
+				player.dead = false;
+				player.x = player.respawnPoint.x;
+				player.y = player.respawnPoint.y;
+				player.dx = 0;
+				player.dy = 0;
+			}else{
+				gameover();
+			}
+		}
 	}
 }
 function updateEntity(entity) {
@@ -177,6 +197,7 @@ function updateEntity(entity) {
 function render(){
 	renderPlayer();
 	renderMap();
+	renderHUD();
 }
 
 function renderMap(){
@@ -188,11 +209,11 @@ function renderMap(){
 				cell = tcell(x, y);
 				bc = bcell(x,y);
 				if (bc) {
-					var ic = icell(bc-1);
+					var ic = icell(bc-1,tilesetsWidth);
 					drawImg(tilesetsImage, ic.x * TILE, ic.y * TILE, TILE, TILE, x * TILE - camera.x, y * TILE - camera.y , TILE, TILE)
 				}
 				if (cell) {
-					var ic = icell(cell-1);
+					var ic = icell(cell-1,tilesetsWidth);
 					drawImg(tilesetsImage, ic.x * TILE, ic.y * TILE, TILE, TILE, x * TILE - camera.x, y * TILE - camera.y , TILE, TILE)
 				}
 			}
@@ -201,9 +222,6 @@ function renderMap(){
 }
 function renderPlayer(){
 	if(player){
-		ctx.fillStyle = "#fff";
-		ctx.font="bold 3px arial";
-		ctx.fillText("WASD или стрелки-движение, Z/J-прыжок, H/X-стрельба, F/ENTER-циклическая смена оружия",0,3);
 		if(player.dx < 0) {
 			player.lookleft = true;
 			player.setAnim("runAnim");
@@ -218,8 +236,12 @@ function renderPlayer(){
 			player.setAnim("jumpAnim");
 		} else if(player.dx != 0){
 			player.setAnim("runAnim");
+			player.respawnPoint.x = player.x;
+			player.respawnPoint.y = player.y;
 		} else {
 			player.setAnim("standAnim");
+			player.respawnPoint.x = player.x;
+			player.respawnPoint.y = player.y;
 		}
 		drawAnim(player, player.x - camera.x, player.y - camera.y, player.width, player.height, player.lookleft);
 		if(player.bullets){
@@ -228,6 +250,21 @@ function renderPlayer(){
 				drawImg(bulletInfo.img, b.ox, b.oy, b.ov, b.oh, player.bullets[i].x - camera.x, player.bullets[i].y - camera.y, b.ov, b.oh, b.h < 0, b.v < 0);
 			}
 		}
+	}
+}
+
+function renderHUD(){
+	if(player){
+		for(var i = 0; i < temp.live; i++){
+			drawImg(temp.hudimg, 0, 0, 8, 8, 10*i, 2, 8, 8);
+		}
+		var p = icell(player.currentGun + 1,4);
+		drawImg(temp.hudimg, 8*p.x, 8*p.y, 8, 8, 2, 10, 8, 8);
+		if(camera.x < canvas.width / camera.scale){
+			ctx.fillStyle = "#fff";
+			ctx.font="bold 3px arial";
+			ctx.fillText("WASD или стрелки-движение, J/Z-прыжок, H/X-стрельба, F/ENTER-циклическая смена оружия",50 - camera.x,30 - camera.y);
+			}
 	}
 }
 
@@ -305,6 +342,11 @@ function setupPlayer(entity, obj){
 	entity.gun = function(){
 		return weapons[this.currentGun];
 	}
+	
+	entity.deadTimer = 0;
+	
+	entity.respawnPoint = {x: entity.x, y: entity.y}
+	entity.respawnPoint.y = entity.y;
 }
 function getMap(name){return TileMaps[name]};
 function t2p(t){return t*TILE;}//номер тайла в координаты
@@ -312,7 +354,7 @@ function p2t(p){return Math.floor(p/TILE);}//координаты в номер 
 function pcell(x,y){return tcell(p2t(x),p2t(y));}//получение ячейки уровня в определённых координатах
 function tcell(tx,ty){return cells[tx + (ty*MAP.tw)];}//получение ячейки уровня по номерам тайлов
 function bcell(tx,ty){return backgrounds[tx + (ty*MAP.tw)];}//получение ячейки фона по номерам тайлов
-function icell(i){return {x: i%tilesetsWidth, y: Math.floor(i/tilesetsWidth)}}
+function icell(i,w){return {x: i%w, y: Math.floor(i/w)}}
 function bound(x, min, max) {// загнать число в рамки
     return Math.max(min, Math.min(max, x));
   }
@@ -346,7 +388,7 @@ function bButton(p){
 		if(player && !player.bullets){
 			player.bullets=[];
 		}
-		if(p){
+		if(p && !player.gun().auto){
 			player.shot();
 		}
 		player.bPressed = p;
@@ -358,6 +400,12 @@ function startButton(p){
 			player.currentGun = 0;
 		}
 	}
+}
+function gameover(){
+	temp.live = 2;
+	setupMap("lvl1");
+	camera.x = 0;
+	camera.y = 0;
 }
 
 function drawImg(img,ox,oy,ow,oh,cx,cy,cw,ch,fh,fv){
