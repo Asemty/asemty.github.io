@@ -1,10 +1,10 @@
 (function(){
 	checkDead = function(bullet){
-		if(bullet.x > camera.x + canvas.width / camera.scale 
+		if(bullet.x > camera.x + camera.width 
 			|| bullet.x + bullet.oh < camera.x
-			|| bullet.y > camera.y + canvas.height / camera.scale 
+			|| bullet.y > camera.y + camera.height 
 			|| bullet.y + bullet.ov < camera.y
-			|| pcell(bullet.x,bullet.y)!=0){
+			|| pcell(bullet.x + bullet.oh / 2,bullet.y + bullet.ov / 2)!=0){
 					bullet.isDead = true;
 				}
 	}
@@ -22,7 +22,7 @@
 			bullet.ov = 4;
 			bullet.h = h;
 			bullet.v = v;
-			bullet.spd = 5;
+			bullet.spd = 4;
 			if(h!= 0 && v!=0){
 				bullet.spd = Math.sqrt((bullet.spd * bullet.spd) / 2);
 			}
@@ -116,12 +116,13 @@
 				this.dy += GRAVITY;
 				checkDead(this);
 				if(this.isDead){
-					explode = createExplode(this.prevx + 2 ,this.prevy + 2, 4);
+					explode = createExplode(this.prevx + 2 ,this.prevy + 2, 5);
 					explode.additionalEvent = function(){
-						var x1 = this.x + 4 + Math.sin(this.explPhase * Math.PI / 3) * 8;
-						var y1 = this.y + 4 + Math.cos(this.explPhase * Math.PI / 3) * 8;
-						var x2 = this.x + 4 + Math.sin(this.explPhase * Math.PI / 3 + Math.PI) * 8;
-						var y2 = this.y + 4 + Math.cos(this.explPhase * Math.PI / 3 + Math.PI) * 8;
+						var size = 8;
+						var x1 = this.x + 4 + Math.sin(this.explPhase * Math.PI / 3) * size;
+						var y1 = this.y + 4 + Math.cos(this.explPhase * Math.PI / 3) * size;
+						var x2 = this.x + 4 + Math.sin(this.explPhase * Math.PI / 3 + Math.PI) * size;
+						var y2 = this.y + 4 + Math.cos(this.explPhase * Math.PI / 3 + Math.PI) * size;
 						partExplode1 = createExplode(x1, y1, this.explDelay);
 						partExplode2 = createExplode(x2, y2, this.explDelay);
 					}
@@ -233,6 +234,7 @@
 		explode.explDelay = delay;
 		explode.explPhase = 0;
 		explode.notOneOff = true;
+		explode.addDmg = 1;
 		explode.upd = function(){
 			if(this.explTimer == this.explDelay){
 				this.explTimer = 0;
