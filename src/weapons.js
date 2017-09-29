@@ -73,7 +73,7 @@
 			bullet.h = h;
 			bullet.v = v;
 			bullet.spd = 4;
-			bullet.addDmg = 2;
+			bullet.dmg = 2;
 			if(h!= 0 && v!=0){
 				bullet.spd = Math.sqrt((bullet.spd * bullet.spd) / 2);
 			}
@@ -105,6 +105,7 @@
 			bullet.v = v;
 			bullet.spd = 4;
 			bullet.dy = 0;
+			bullet.dmg = 3;
 			if(h!= 0 && v!=0){
 				bullet.spd = Math.sqrt((bullet.spd * bullet.spd) / 2);
 			}
@@ -146,6 +147,7 @@
 			bullet.ov = v!=0?8:4;
 			bullet.spd = 2;
 			bullet.notOneOff = true;
+			bullet.dmg = 0.5;
 			if(h!= 0 && v!=0){
 				bullet.spd = Math.sqrt((bullet.spd * bullet.spd) / 2);
 			}
@@ -173,6 +175,7 @@
 			bullet.h = h + -Math.sign(v)*(-0.2 + 0.1 * i); //€ не разобралс€, как работает этот алгоритм.
 			bullet.v = v + Math.sign(h)*(-0.2 + 0.1 * i);	//дл€ его подбора был использован метод научного тыка
 			bullet.spd = 5;
+			bullet.dmg = 0.5;
 			if(h!= 0 && v!=0){
 				bullet.spd = Math.sqrt((bullet.spd * bullet.spd) / 2);
 			}
@@ -202,6 +205,7 @@
 			bullet.spd = 8;
 			bullet.notOneOff = true;
 			bullet.timer = 0;
+			bullet.dmg = 0.15;
 			if(h!= 0 && v!=0){
 				bullet.spd = Math.sqrt((bullet.spd * bullet.spd) / 2);
 			}
@@ -234,7 +238,7 @@
 		explode.explDelay = delay;
 		explode.explPhase = 0;
 		explode.notOneOff = true;
-		explode.addDmg = 1;
+		explode.dmg = 0.07;
 		explode.upd = function(){
 			if(this.explTimer == this.explDelay){
 				this.explTimer = 0;

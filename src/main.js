@@ -1,27 +1,41 @@
 ﻿function start(){
-	camera = { x: 0, y: 0, scale: 6, scroll: "only_right"};
-	camera.width = canvas.width / camera.scale;
-	camera.height = canvas.height / camera.scale;
-	ctx.scale(camera.scale,camera.scale);
-	ctx.imageSmoothingEnabled = false;
-	playerInfo = {img: new Image(), width: 8, height: 8};
-	bulletInfo = {img: new Image(), width: 8, height: 8};
-	addImage("images/player.png","player",5,8)
-	addImage("images/bullet.png","bullet",4,8)
-	addImage("images/hud.png","hud",4,8)
-	addImage("images/enemy1.png","enemy1",8,8)
-	
-	enemies = [];
-	treasures = [];
-	spawners = [];
 	GRAVITY  = 1/5;
 	MAXDX    = 2;      
 	MAXDY    = 8;     
 	ACCEL    = 0.1;     
 	FRICTION = 1;     
 	IMPULSE  = 4;
+
+	camera = { x: 0, y: 0, scale: 6, scroll: "only_right"};
+	camera.width = canvas.width / camera.scale;
+	camera.height = canvas.height / camera.scale;
+	ctx.scale(camera.scale,camera.scale);
+	ctx.imageSmoothingEnabled = false;
+	addImage("images/player.png","player",5,8)
+	addImage("images/bullet.png","bullet",4,8)
+	addImage("images/hud.png","hud",4,8)
+	addImage("images/enemy1.png","enemy1",8,8)
+	addImage("images/bosses.png","bosses")
 	
 	startGame();
+	
+	
+	
+	/////////////////////Temp////////////////////
+	player.x = 960;
+	camera.x = 948;
+	enemies.push(setupWalkerTank(1080,32));
+}
+function startGame(lvl){
+	if(!lvl) var lvl = "lvl1";
+	enemies = [];
+	treasures = [];
+	spawners = [];
+	
+	scenario = scenarios[lvl];
+	scenario.start();
+	setupMap(lvl);
+	player.live = 2;
 }
 
 function setupMap(name){
@@ -29,7 +43,7 @@ function setupMap(name){
 	MAP = { tw: curentMap.width, th: curentMap.height };
 	TILE = curentMap.tileheight;
 	tilesetsImage = new Image();
-	tilesetsImage.src=curentMap.tilesets[0].image.substring(3);
+	tilesetsImage.src = curentMap.tilesets[0].image.substring(3);
 	tilesetsWidth = curentMap.tilesets[0].columns;
 	cells = curentMap.layers[0].data;
 	objects = curentMap.layers[1].objects;
@@ -46,7 +60,7 @@ function setupMap(name){
 		}
     }
 }
-function setupEntity(obj) {
+function setupEntity(obj, name) {
     var entity = {};
     entity.x		= obj.x;
     entity.y		= obj.y;
@@ -56,14 +70,16 @@ function setupEntity(obj) {
     entity.dy		= 0;
     entity.start    = { x: obj.x, y: obj.y }
 	if(obj.properties) entity.lookLeft = obj.properties.lookLeft;
-	switch(obj.name){
+	if(!name){
+		var name = obj.name;
+	}
+	switch(name){
 		case "player": setupPlayer(entity, obj); break;
 		case "soldier": setupSoldier(entity, obj); break;
 		case "spawner": setupSpawner(entity, obj); break;
 	}
     return entity;
 }
-
 function setupPlayer(entity, obj){
 	entity.standAnim = {spd: 0, pic: images["player"], frames: [[0,0]]};
 	entity.runAnim = {spd: 0.3, pic: images["player"], frames: [[0,0],[1,0],[2,0],[3,0]]};
@@ -115,6 +131,7 @@ function update(){
 	ctx.fillRect(0,0,canvas.width,canvas.height);
 	updateEntities();
 	updateCamera();
+	scenario.update();
 	render();
 }
 function updateEntities(){
@@ -124,6 +141,8 @@ function updateEntities(){
 		if(enemies[i].update)enemies[i].update();
 		if(!enemies[i].isDead){
 			newEnemies.push(enemies[i]);
+		}else{
+			var a =0;
 		}
 	}
 	enemies = newEnemies;
@@ -304,6 +323,8 @@ function updateCamera(){
 		case "const_right":
 			camera.x += MAXDX / 4*3;
 			break;
+		case "static":
+			break;
 	}
 }
 
@@ -430,17 +451,10 @@ function startButton(p){
 	}
 }
 
-function startGame(lvl){
-	enemies = [];
-	treasures = [];
-	spawners = [];
-	setupMap(lvl ? lvl : "lvl1");
-	player.live = 2;
-}
 function gameover(){
-	startGame();
 	camera.x = 0;
 	camera.y = 0;
+	startGame();
 }
 
 function getMap(name){return TileMaps[name]};

@@ -17,6 +17,9 @@ function drawImg(img,ox,oy,ow,oh,cx,cy,cw,ch,fh,fv){
 		ctx.drawImage(img,ox,oy,ow,oh,cx,cy,cw,ch);
 	}
 }
+function drawSprite(part,x,y,fh,fv){
+	drawImg(part.img, part.ox, part.oy, part.ow, part.oh, x, y, part.width, part.height, fh, fv);
+}
 
 function drawAnim(currentAnimation,x,y,w,h,fh,fv){
 	if(currentAnimation){

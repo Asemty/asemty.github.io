@@ -28,11 +28,11 @@ function setupEnemy(entity){
 					for(var i = 0; i < player.bullets.length; i++){
 						var bullet = player.bullets[i];
 						if(!bullet.isDead && intersect(this.x, this.y, this.width, this.height, bullet.x, bullet.y, bullet.oh, bullet.ov)){
-							if(this.live || !bullet.notOneOff){
+							if(!bullet.notOneOff){
 								bullet.isDead = true;
 							}
 							if(this.live){
-								this.live-= 1 + bullet.addDmg;
+								this.live -= bullet.dmg || 1;
 							}
 							if(!this.live || this.live <= 0){
 								this.dead = true;
@@ -233,7 +233,7 @@ function createDirectedShot(x,y){
 }
 function setupSpawner(entity, obj){
 	entity.template = obj;
-	entity.template.name = entity.template.properties.spawn;
+	entity.spawnCounter = 0;
 	entity.update = function(){
 		var onBigSquare = this.x + this.width > camera.x - camera.width / 3 
 			&& this.x < camera.x + camera.width + camera.width / 3 
@@ -245,10 +245,12 @@ function setupSpawner(entity, obj){
 			  && this.y + this.height  > camera.y
 			  && this.y < camera.y + camera.height;
 			  if(!onScreen){
-				if(Math.random() < 0.01){
-					var children = setupEntity(this.template);
+			  this.spawnCounter ++;
+				if(this.spawnCounter > 100){
+					var children = setupEntity(this.template,this.template.properties.spawn);
 					children.lookLeft = player.x < this.x;
 					enemies.push(children);
+					this.spawnCounter = 0;
 				}
 			  }
 		}
