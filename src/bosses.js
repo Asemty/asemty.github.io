@@ -12,6 +12,7 @@ function setupWalkerTank(x, y){
 	entity.animCounter = 0;
 	entity.ox = 0;
 	entity.oy = 0;
+	entity.state = "idle";
 	entity.sprite = {img: images["bosses"].img, ox: 16, oy: 0, ow: 19, oh: 8, width: 16, height: 8};
 	
 	entity.parts = [];
@@ -106,24 +107,62 @@ function setupWalkerTank(x, y){
 			player.dead = true;
 		}
 		this.animCounter ++;
-		this.oy = Math.sin(this.animCounter * 0.1) * 1.2;
 		var lul = this.parts["leftUpLeg"],
 			rul = this.parts["rightUpLeg"],
 			ldl = this.parts["leftDownLeg"],
 			rdl = this.parts["rightDownLeg"];
-		lul.oy = Math.sin(this.animCounter * 0.1);
-		rul.oy = Math.sin(this.animCounter * 0.1);
+		switch(this.state)
+		{
+		case "idle":
+			this.oy += (Math.sin(this.animCounter * 0.15) - this.oy) / 2;
+			break;
+		case "jumpReady":
+				this.oy += (8 - this.oy) / 20;
+			break;
+			case "jump":
+				this.oy += (-4 - this.oy) / 2;
+				this.state = "fly";
+				if(!this.falling){
+					this.dy = -5;
+					this.y -= 1;
+					this.dx = (player.x + player.width / 2 - (this.x + this.width / 2)) / (- this.dy / GRAVITY * 2);
+				}
+			case "fly":
+				this.oy = -5;
+				if(this.dy == 0){
+					this.state = "idle";
+				}
+			break;
+		}
+		if(player.lookup){
+			this.state = "jumpReady";
+		}else{
+			if(this.state == "jumpReady"){
+				this.state = "jump";
+			}
+		}
+		if(player.lookdown){
+		}
 		
+		lul.ox = (ldl.ox + this.ox) / 2;
+		rul.ox = (rdl.ox + this.ox) / 2;
+		lul.oy = (ldl.oy + this.oy) / 2;
+		rul.oy = (rdl.oy + this.oy) / 2;
+		
+		if(this.dy == 0){
+			this.dx = 0;
+		}
 		var legLevel = this.y + 13 + Math.max(ldl.sy + ldl.oy, rdl.sy + rdl.oy);
 		this.falling = pcell(this.x, legLevel) == 0;
 		if(this.falling) {
-			this.dy += GRAVITY/2;
+			this.dy += GRAVITY;
 			this.dy = bound(this.dy, -MAXDY, MAXDY)
 		}else{
 			this.dy = 0;
 			this.y -= legLevel % TILE;
 		}
 		this.y += this.dy;
+		this.x += this.dx;
 		
 	}
 	return entity;

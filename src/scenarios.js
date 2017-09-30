@@ -1,7 +1,6 @@
 scenarios = [];
 scenarios["lvl1"] ={
 	start: function(){
-			this.start = true;
 			this.killFirstBoss = false;
 			this.phase = 0;
 	},
