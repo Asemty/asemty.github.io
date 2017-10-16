@@ -1,11 +1,5 @@
 function setupEnemy(entity){
 	entity.update = function(){
-	/*var onBigSquare = this.x + this.width > camera.x - camera.width / 5 
-			&& this.x < camera.x + camera.width + camera.width / 5 
-			&& this.y - this.height > camera.y - camera.height / 5 
-			&& this.y < camera.y + camera.height + camera.height / 5;
-	*/
-	
 	//entity.cantDead - взаимодействие со снарядами игрока
 	//entity.canLeaveScreen - может покинуть экран
 	//entity.cantKill - взаимодействие с игроком
@@ -63,9 +57,6 @@ function setupEnemy(entity){
 				this.deathCounter ++;
 				if(this.deathCounter >= (this.maxDeathCounter ? this.maxDeathCounter : 10)){
 					this.isDead = true;
-					if(this.onEndDead){
-						this.onEndDead();
-					}
 				}
 			}
 		}
@@ -180,7 +171,7 @@ function setupSoldier(entity, obj){
 		this.left = false;
 		this.right = false;
 	}
-	entity.onEndDead = function(){
+	entity.onDead = function(){
 		createDecorExplosion(this.x, this.y, 8, 8, 3);
 	}
 }
@@ -203,6 +194,7 @@ function createDecorExplosion(x,y,w,h,delay){
 	}
 	enemies.push(explosion);
 }
+
 function createDirectedShot(x,y){
 		bullet = {};
 		bullet.x = x;
@@ -217,7 +209,7 @@ function createDirectedShot(x,y){
 			y1 = bullet.y + 2,
 			x2 = player.x + player.width / 2,
 			y2 = player.y + player.height / 2;
-		bullet.angle =Math.atan2(y2 - y1, x2 - x1);
+		bullet.angle = Math.atan2(y2 - y1, x2 - x1);
 		bullet.speed = 2;
 		bullet.ai = function(){
 			if(pcell(this.x + this.width / 2,this.y + this.height / 2)!=0){
@@ -230,6 +222,7 @@ function createDirectedShot(x,y){
 			drawImg(images["enemy1"].img, 42, 2, 4, 4, this.x - camera.x, this.y - camera.y, this.width, this.height)
 		}
 		enemies.push(bullet);
+		return bullet;
 }
 function setupSpawner(entity, obj){
 	entity.template = obj;
@@ -255,4 +248,107 @@ function setupSpawner(entity, obj){
 			  }
 		}
 	}
+}
+function createFireExplode(x,y,delay){//x и y-центр взрыва
+	explode = {};
+	explode.x = x - 4;
+	explode.y = y - 4;
+	explode.width = 8;
+	explode.height = 8;
+	setupEnemy(explode);
+	explode.notNeedPhisic = true;
+	explode.cantDead = true;
+	explode.explTimer = 0;
+	explode.explDelay = delay;
+	explode.explPhase = 0;
+	explode.notOneOff = true;
+	explode.dmg = 0.07;
+	explode.ai = function(){
+		if(this.explTimer == this.explDelay){
+			this.explTimer = 0;
+			this.explPhase++;
+			if(this.explPhase == 4){
+				this.isDead = true;
+				return;
+			}
+			if(this.additionalEvent){
+				this.additionalEvent();
+			}
+		}
+		this.explTimer++;
+	}
+	explode.render = function(){
+		drawImg(images["enemy1"].img, 32 + 8 * this.explPhase, 16, 8, 8, this.x - camera.x, this.y - camera.y, this.width, this.height)
+	}
+	enemies.push(explode);
+	return explode;
+}
+function createFallingShot(x,y,dx,dy){
+		bullet = {};
+		bullet.x = x;
+		bullet.y = y;
+		bullet.width = 4;
+		bullet.height = 4;
+		bullet.dx = dx;
+		bullet.dy = dy;
+		setupEnemy(bullet);
+		bullet.notNeedPhisic = true;
+		bullet.cantDead = true;
+		bullet.ai = function(){
+			if(pcell(this.x + this.width / 2,this.y + this.height / 2)!=0){
+					this.isDead = true;
+				}
+			this.x += dx;
+			this.y += dy;
+			dy += GRAVITY;
+		}
+		bullet.render = function(){
+			drawImg(images["enemy1"].img, 42, 2, 4, 4, this.x - camera.x, this.y - camera.y, this.width, this.height)
+		}
+		enemies.push(bullet);
+		return bullet;
+}
+
+function createMovingFire(x,y,delay, maxPhase, left, createPhase){
+	explode = {};
+	explode.x = x;
+	explode.y = y;
+	explode.width = 8;
+	explode.height = 8;
+	setupEnemy(explode);
+	explode.notNeedPhisic = true;
+	explode.cantDead = true;
+	explode.delay = delay;
+	explode.explTimer = 0;
+	explode.explPhase = 0;
+	explode.maxPhase = maxPhase;
+	explode.isLeft = left;
+	explode.createPhase = createPhase;
+	explode.ai = function(){
+		if(this.explTimer == this.delay){
+			this.explTimer = 0;
+			this.explPhase++;
+			if(this.explPhase == this.maxPhase){
+				this.isDead = true;
+				return;
+			}
+			if(this.explPhase == this.createPhase){
+				var nx = this.x + (this.isLeft ? -8 : 8);
+				if(nx > camera.x - this.width && nx < camera.x + camera.width && pcell(nx + (!this.isLeft ? this.width : 0),this.y) == 0 && pcell(nx + (!this.isLeft ? this.width : 0),this.y + 8) != 0){
+					var f = createMovingFire(nx,this.y,this.delay, this.maxPhase, this.isLeft, this.createPhase);
+					f.render = this.render;
+					f.additionalEvent = this.additionalEvent;
+				}
+			}
+			if(this.additionalEvent){
+				this.additionalEvent();
+			}
+		}
+		this.explTimer++;
+	}
+	explode.render = function(){
+		drawImg(images["enemy1"].img, 8 * (this.explPhase ? (this.explPhase - 1) % 3 + 1 : 0), 8, 8, 8, this.x - camera.x, this.y - camera.y, this.width, this.height, this.isLeft)
+	}
+	enemies.push(explode);
+	return explode;
 }

@@ -53,3 +53,86 @@ function addImage(src, key, width, cellSize){//width-колличество тайлов в строке
 function intersect(x1,y1,w1,h1,x2,y2,w2,h2){
 	return Math.abs(x1 + w1 / 2 - (x2 + w2 / 2)) < (w1 + w2) / 2 && Math.abs(y1 + h1 / 2 - (y2 + h2 / 2)) < (h1 + h2) / 2
 }
+function intersectPointBox(px,py,bx,by,bw,bh){
+	return px >= bx && px <= bx + bw && py >= by && py <= by + bh;
+}
+
+/*function intersectRayCamera(ray){
+	var k = Math.tan(ray.angle/* + (ray.angle % Math.PI == Math.PI / 2 ? Math.PI / 2000 : 0 ));
+	var y = k * (camera.x - ray.x) + ray.y;
+	if(y >= camera.y && y <= camera.y + camera.height) return {x: camera.x, y: y};
+	y = k * (camera.x + camera.width - ray.x) + ray.y;
+	if(y >= camera.y && y <= camera.y + camera.height) return {x: camera.x + camera.width, y: y};
+	var x = (camera.y - ray.y) / k + ray.x;
+	if(x >= camera.x && x <= camera.x + camera.width) return {x: x, y: camera.y};
+	x = (camera.y + camera.height - ray.y) / k + ray.x;
+	if(x >= camera.x && x <= camera.x + camera.width) return {x: x, y: camera.y + camera.height};
+	return {x: 0, y: 0};
+}*/
+
+function intersectRayRectangle(rayx,rayy,raya,rectx,recty,rectw,recth,isCam){
+	var angle = raya % (Math.PI * 2),
+		p2 = Math.PI / 2,
+		k = Math.tan(angle), x, y;
+		var l = angle > p2 && angle < p2 * 3,
+			u = angle > Math.PI,
+			r = angle > p2 * 3 || angle < p2,
+			d = angle < Math.PI;
+	if(!intersectPointBox(rayx,rayy,rectx,recty,rectw,recth)){
+		if(rayx < rectx + rectw / 2 && r ||
+			rayy < recty + recth / 2 && d ||
+			rayx > rectx + rectw / 2 && l ||
+			rayy > recty + recth / 2 && u){
+			var nl = rayx < rectx && r,
+			nu = rayy < recty && d,
+			r = rayx > rectx + rectw && l,
+			d = rayy > recty + recth && u;
+			l = nl, u = nu; // костыль!
+		}else{
+			l = u = r = d = false;
+		}
+	}
+	
+	if(l){ // left
+		y = k * (rectx - rayx) + rayy;
+		if(y >= recty && y <= recty + recth){
+			return {x: rectx, y: y};
+		}
+	}
+	
+	if(u){ // up
+		x = (recty - rayy) / k + rayx;
+		if(x >= rectx && x <= rectx + rectw){
+			return {x: x, y: recty};
+		}
+	}
+	
+	if(r){ //right
+		y = k * (rectx + rectw - rayx) + rayy;
+		if(y >= recty && y <= recty + recth){
+			return {x: rectx + rectw, y: y};
+		}
+	}
+	if(d){ // down
+		x = (recty + recth - rayy) / k + rayx;
+		if(x >= rectx && x <= rectx + rectw){
+			return {x: x, y: recty + recth};
+		}
+	}
+	if(!isCam && intersectPointBox(rayx,rayy,camera.x,camera.y,camera.width,camera.height)){
+		return intersectRayRectangle(rayx,rayy,raya,camera.x,camera.y,camera.width,camera.height,true)
+	}
+	return {x: 0, y: 0};	
+}
+function intersectRayInBox(rx,ry,ra){
+	if(rx < camera.x + camera.width){
+	return false;
+	}
+}
+
+function drawLine(x1, y1, x2, y2){
+	ctx.beginPath();
+	ctx.moveTo(x1 - camera.x, y1 - camera.y);
+	ctx.lineTo(x2 - camera.x, y2 - camera.y);
+	ctx.stroke();
+}

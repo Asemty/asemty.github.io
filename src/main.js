@@ -22,9 +22,9 @@
 	
 	
 	/////////////////////Temp////////////////////
-	player.x = 960;
-	camera.x = 948;
-	enemies.push(setupWalkerTank(1080,32));
+	//player.x = 960;
+	//camera.x = 948;
+	//enemies.push(setupWalkerTank(1080,32));
 }
 function startGame(lvl){
 	if(!lvl) var lvl = "lvl1";
@@ -32,6 +32,7 @@ function startGame(lvl){
 	treasures = [];
 	spawners = [];
 	
+	camera.scroll = "only_right";
 	scenario = scenarios[lvl];
 	scenario.start();
 	setupMap(lvl);
@@ -141,8 +142,8 @@ function updateEntities(){
 		if(enemies[i].update)enemies[i].update();
 		if(!enemies[i].isDead){
 			newEnemies.push(enemies[i]);
-		}else{
-			var a =0;
+		}else if(enemies[i].onDead){
+			enemies[i].onDead();
 		}
 	}
 	enemies = newEnemies;
@@ -340,6 +341,7 @@ function render(){
 		}
 	}
 	renderMap();
+	scenario.render();
 	renderHUD();
 }
 function renderMap(){
@@ -388,6 +390,28 @@ function renderPlayer(){
 				drawImg(images["bullet"].img, b.ox, b.oy, b.ov, b.oh, player.bullets[i].x - camera.x, player.bullets[i].y - camera.y, b.ov, b.oh, b.h < 0, b.v < 0);
 			}
 		}
+		////////////////
+		if(!player.ray){
+			player.ray = 0;
+		}
+		//player.ray.angle = 3.1415 / 2 * 3;
+		player.ray += 0.01;
+		ctx.strokeStyle = "red";
+		//if(enemies && enemies[11])
+		/*for(var i = 0; i < 36; i++){
+			var p = intersectRayRectangle(
+			player.x + player.width / 2,
+			player.y + player.height / 2,
+			player.ray + Math.PI / 18 * i,
+			enemies[11].x ,
+			enemies[11].y ,
+			enemies[11].width ,
+			enemies[11].height );*/
+		//ctx.fillStyle = "#fff";
+		//ctx.font="bold 3px arial";
+		//ctx.fillText(p1.x,0,20);
+		//drawLine(player.x + player.width / 2, player.y + player.height / 2, p.x, p.y);
+		//}
 	}
 }
 function renderHUD(){
