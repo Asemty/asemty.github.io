@@ -20,8 +20,8 @@
 	startGame();
 	
 	/////////////////////Temp////////////////////
-	player.x = 960;
-	camera.x = 948;
+	//player.x = 960;
+	//camera.x = 948;
 	//enemies.push(setupWalkerTank(1080,32));
 }
 function startGame(lvl){
