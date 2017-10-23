@@ -7,9 +7,11 @@ function setupWalkerTank(x, y){
 	var entity = setupEntity(obj)
 	//setupEnemy(entity);
 	
-	entity.live = 1;
+	entity.live = 45;
 	entity.notNeedPhisic = true;
 	entity.animCounter = 0;
+	entity.maxGunCharge = FRAMERATE * 1.5;
+	entity.jumpCounter = 0;
 	entity.ox = 0;
 	entity.oy = 0;
 	entity.stateTimer = 0;
@@ -85,6 +87,16 @@ function setupWalkerTank(x, y){
 	entity.parts["extraGun"] = eg;
 	
 	entity.render = function(){
+		if(this.state == this.states.gunCharge && !!this.gunAimPointDown){
+			if(this.maxGunCharge - this.gunCharge > 3){
+				ctx.strokeStyle = "white";
+			}else{
+				ctx.strokeStyle = "red";
+			}
+			var xx = this.x + this.ox + this.width / 2, yy = this.y + this.oy + 3;
+			drawLine(xx, yy, this.gunAimPointDown.x, this.gunAimPointDown.y);
+			drawLine(xx, yy, this.gunAimPointUp.x, this.gunAimPointUp.y);
+		}
 		if(this.damageDelay == 0){
 			for(var prtNm in this.parts){
 				var prt = this.parts[prtNm];
@@ -104,6 +116,9 @@ function setupWalkerTank(x, y){
 			}
 			drawSprite(this.sprite, this.x + this.ox - camera.x, this.y + this.oy - camera.y, this.isLeft);
 		}
+		ctx.fillStyle = "#fff";
+		ctx.font="bold 3px arial";
+		ctx.fillText("Boss: " + this.live,camera.width - 15,3);
 	}
 	entity.update = function(){
 		if(!this.dead){
@@ -122,8 +137,8 @@ function setupWalkerTank(x, y){
 			}else{
 				this.damageDelay--;
 			}
-			if(!player.dead && !this.dead && intersect(this.x + this.ox, this.y + this.oy, this.width, this.height, player.x, player.y, player.width, player.height)){
-				player.dead = true;
+			if(!this.dead && intersect(this.x + this.ox, this.y + this.oy, this.width, this.height, player.x, player.y, player.width, player.height)){
+				player.kill();
 			}
 			this.animCounter ++;
 			this.ai();
@@ -151,13 +166,13 @@ function setupWalkerTank(x, y){
 			ldl = this.parts["leftDownLeg"],
 			rdl = this.parts["rightDownLeg"];
 		
-		if(player.lookup){
+		/*if(player.lookup){
 			this.state = this.states.jumpReady;
 		}else{
 			if(this.state == this.states.jumpReady){
 				this.state = this.states.jump;
 			}
-		}
+		}*/
 		if(player.lookdown){
 			/*if(this.tmpData != this.isLeft){
 				this.flip();
@@ -197,8 +212,8 @@ function setupWalkerTank(x, y){
 		}
 	}
 	entity.granadeAttack = function(){
-		
-		var bullet = createFallingShot(this.x, this.y, this.isLeft ? -3 : 3, -3);
+		var dx = (player.x + player.width / 2 - (this.x + this.width / 2)) / (- 3 / GRAVITY * 2);
+		var bullet = createFallingShot(this.x, this.y, -dx, -3);
 		bullet.onDead = function(){
 			/*var exp = createFireExplode(this.x + 2, this.y + 2, 3);
 			exp.additionalEvent = function(){
@@ -215,30 +230,65 @@ function setupWalkerTank(x, y){
 			drawImg(images["enemy1"].img, 8 * Math.floor((this.timer - 1) / 3), 16, 8, 8, this.x - camera.x, this.y - camera.y, this.width, this.height)
 		}
 	}
+	entity.throwGranade = function(){
+				var maxNum = 5;
+				for(var num = 0; num < maxNum; num++){
+					var left = (this.x + this.width / 2) < (camera.x + camera.width / 2)
+					var dx = (this.x - camera.x - camera.width / maxNum * num) / (- 5 / GRAVITY * 2);
+					var bullet = createFallingShot(this.x, this.y, dx, -5);
+					bullet.onDead = function(){
+						var exp = createFireExplode(this.x + 2, this.y + 2, 3);
+						exp.additionalEvent = function(){
+							createFireExplode(this.x + 4, this.y - this.explPhase * 12 + 4, this.explDelay);
+						}
+					}
+				}
+			}
+	entity.landing = function(){
+		switch(this.landingPhase){
+			case "start": 
+				this.states.setDelay(this, FRAMERATE, this.states.jumpReady);
+				this.landingPhase = "shoot";
+				break;
+			case "shoot":
+				this.states.setDelay(this, FRAMERATE / 3, this.states.gunCharge);
+				this.gunCharge = 0;
+				this.landingPhase = "fireGranade";
+				break;
+			case "fireGranade": 
+				this.states.setDelay(this, FRAMERATE, this.states.jumpReady,this.granadeAttack());
+				if(this.jumpCounter < 2){
+					this.jumpCounter++;
+				}else{
+					this.jumpCounter = 0;
+					this.landingPhase = "verticalExplosion";
+					this.toPlayer = false;
+				}
+				break;
+			case "verticalExplosion": 
+				this.states.setDelay(this, FRAMERATE, this.states.jumpReady,this.throwGranade());
+					if(this.jumpCounter < 2){
+						this.jumpCounter++;
+					}else{
+						this.jumpCounter = 0;
+						this.landingPhase = "shoot";
+					}
+				break;
+		}
+	}
 	entity.ai = function(){
 		if(!this.states){
 			this.states = {};
 			this.states.maxJump = function(ent){
 				ent.dy = -5;
 				ent.y -= 1;
-				var left = (ent.x + ent.width / 2) > (camera.x + camera.width / 2)
+				var left = (ent.x + ent.width / 2) > (camera.x + camera.width / 2);
 				ent.dx = (camera.x + (left ? ent.width : camera.width - ent.width * 2) - ent.width - (ent.x - ent.width)) / (- ent.dy / GRAVITY * 2);
 			}
 			this.states.playerJump = function(ent){
 				ent.dy = -5;
 				ent.y -= 1;
 				ent.dx = (player.x + player.width / 2 - (ent.x + ent.width / 2)) / (- ent.dy / GRAVITY * 2);
-			}
-			this.states.throwGranade = function(ent, num, maxNum){
-				var left = (ent.x + ent.width / 2) < (camera.x + camera.width / 2)
-				var dx = (ent.x - camera.x - camera.width / maxNum * num) / (- 3 / GRAVITY * 2);
-				var bullet = createFallingShot(ent.x, ent.y, dx, -3);
-				bullet.onDead = function(){
-					var exp = createFireExplode(this.x + 2, this.y + 2, 3);
-					exp.additionalEvent = function(){
-						createFireExplode(this.x + 4, this.y - this.explPhase * 12 + 4, this.explDelay);
-					}
-				}
 			}
 			this.states.onFly = function(ent){
 				ent.oy = -5;
@@ -249,6 +299,7 @@ function setupWalkerTank(x, y){
 				}
 				if(ent.dy == 0){
 					ent.state = this.states.idle;
+					ent.landing();
 				}
 			}
 			this.states.idle = function(ent){
@@ -256,18 +307,67 @@ function setupWalkerTank(x, y){
 			}
 			this.states.jumpReady = function(ent){
 				ent.oy += (8 - ent.oy) / 20;
+				if(Math.abs(8 - ent.oy) < 1.5){
+					ent.state = ent.states.jump;
+				}
 			}
 			this.states.jump = function(ent){
 				ent.oy += (-4 - ent.oy) / 2;
 				ent.state = this.states.onFly;
 				if(!ent.falling){
-					ent.states.maxJump(ent);
+					if(!ent.toPlayer){
+						ent.states.maxJump(ent);
+					} else {
+						ent.states.playerJump(ent);
+					}
 				}
 			}
+			this.states.setDelay = function(ent, d, fun, evn){
+				ent.delayNextState = d;
+				ent.nextState = fun;
+				ent.nextEvent = evn;
+			}
+			this.states.gunCharge = function(ent){
+				ent.oy += (8 - ent.oy) / 20;
+				if(ent.gunCharge < ent.maxGunCharge){
+					ent.gunCharge ++;
+					var aimX = this.x + this.ox + this.width / 2, aimY = this.y + this.oy + 3;
+					ent.gunAimPointUp = intersectRayRectangle(
+						aimX,
+						aimY,
+						(ent.isLeft ? Math.PI : 0) - Math.PI / 6 + Math.PI / 6 * ent.gunCharge / ent.maxGunCharge,
+						player.x,
+						player.y,
+						player.width,
+						player.height);
+					ent.gunAimPointDown = intersectRayRectangle(
+						aimX,
+						aimY,
+						(ent.isLeft ? Math.PI : 0) + Math.PI / 6 - Math.PI / 6 * ent.gunCharge / ent.maxGunCharge,
+						player.x,
+						player.y,
+						player.width,
+						player.height);
+					if(ent.maxGunCharge - ent.gunCharge < 3 && (ent.gunAimPointUp.intersect || ent.gunAimPointDown.intersect)){
+						player.kill();
+					}
+				}else{
+					ent.toPlayer = true;
+					ent.state = ent.states.idle;
+					ent.states.setDelay(ent, FRAMERATE, this.states.jumpReady)
+				}
+			}
+			
 			this.state = this.states.jump;
+			this.landingPhase = "start";
 		}
 		//if(this.tmp % 10 == 0)this.states.throwGranade(this, Math.floor(this.tmp / 10) % 10, 10);
 		this.state(this);
+		if(this.delayNextState == 0){
+				if(this.nextState)this.state = this.nextState;
+				if(this.nextEvent)this.nextEvent();
+			}
+		this.delayNextState--;
 	}
 	
 	return entity;

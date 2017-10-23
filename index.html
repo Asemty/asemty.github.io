@@ -14,6 +14,7 @@ window.onload=function() {
 	document.addEventListener('keydown', function(ev) { return keyPress(ev, true);  }, false);
 	document.addEventListener('keyup',   function(ev) { return keyPress(ev, false); }, false);
 	start();
-    setInterval(update,1000/45);
+	FRAMERATE = 45;
+    setInterval(update,1000 / FRAMERATE);
 }
 </script>

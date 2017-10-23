@@ -35,8 +35,8 @@ function setupEnemy(entity){
 					}
 				}
 				if(!this.cantKill){
-					if(!player.dead && !this.dead && intersect(this.x, this.y, this.width, this.height, player.x, player.y, player.width, player.height)){
-						player.dead = true;
+					if(!this.dead && intersect(this.x, this.y, this.width, this.height, player.x, player.y, player.width, player.height)){
+						player.kill();
 					}
 				}
 				if(!this.dead 

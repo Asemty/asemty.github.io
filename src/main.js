@@ -19,11 +19,9 @@
 	
 	startGame();
 	
-	
-	
 	/////////////////////Temp////////////////////
-	//player.x = 960;
-	//camera.x = 948;
+	player.x = 960;
+	camera.x = 948;
 	//enemies.push(setupWalkerTank(1080,32));
 }
 function startGame(lvl){
@@ -96,6 +94,7 @@ function setupPlayer(entity, obj){
 	entity.bullets=[];
 	entity.gunCounter = 0;
 	entity.currentGun = 0;
+	entity.immune = 0;
 	entity.shot = function(){
 		if(!player.dead){
 			var h = 0, v = 0;
@@ -117,12 +116,18 @@ function setupPlayer(entity, obj){
 			this.gunCounter = 0;
 		}
 	}
+	entity.kill = function(){
+		if(!this.dead && this.immune <= 0){
+				this.dead = true;
+		}
+	}
 	entity.gun = function(){
 		return weapons[this.currentGun];
 	}
 	entity.spawn = function(){
-		entity.y = -entity.height;
-		entity.x = camera.x + TILE * 3;
+		this.y = -this.height;
+		this.x = camera.x + TILE * 3;
+		this.immune = FRAMERATE * 2;
 	}
 	entity.deadTimer = 0;
 }
@@ -192,6 +197,7 @@ function updatePlayer(){
 		player.bullets = newBullets;
 	}
 	player.gunCounter++;
+	if(player.immune > 0) player.immune --;
 	if(player.bPressed && player.gun().auto && (!player.gun().delay || player.gun().delay < player.gunCounter)){
 			player.shot();
 			player.gunCounter = 0;
@@ -383,35 +389,13 @@ function renderPlayer(){
 		} else {
 			player.setAnim("standAnim");
 		}
-		drawAnim(player.currentAnimation, player.x - camera.x, player.y - camera.y, player.width, player.height, player.lookleft);
+		if(player.immune < 0 || Math.floor(player.immune / 3) % 2 == 0)drawAnim(player.currentAnimation, player.x - camera.x, player.y - camera.y, player.width, player.height, player.lookleft);
 		if(player.bullets){
 			for(var i=0;i < player.bullets.length; i++){
 				var b = player.bullets[i];
 				drawImg(images["bullet"].img, b.ox, b.oy, b.ov, b.oh, player.bullets[i].x - camera.x, player.bullets[i].y - camera.y, b.ov, b.oh, b.h < 0, b.v < 0);
 			}
 		}
-		////////////////
-		if(!player.ray){
-			player.ray = 0;
-		}
-		//player.ray.angle = 3.1415 / 2 * 3;
-		player.ray += 0.01;
-		ctx.strokeStyle = "red";
-		//if(enemies && enemies[11])
-		/*for(var i = 0; i < 36; i++){
-			var p = intersectRayRectangle(
-			player.x + player.width / 2,
-			player.y + player.height / 2,
-			player.ray + Math.PI / 18 * i,
-			enemies[11].x ,
-			enemies[11].y ,
-			enemies[11].width ,
-			enemies[11].height );*/
-		//ctx.fillStyle = "#fff";
-		//ctx.font="bold 3px arial";
-		//ctx.fillText(p1.x,0,20);
-		//drawLine(player.x + player.width / 2, player.y + player.height / 2, p.x, p.y);
-		//}
 	}
 }
 function renderHUD(){

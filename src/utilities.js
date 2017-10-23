@@ -71,6 +71,9 @@ function intersectPointBox(px,py,bx,by,bw,bh){
 }*/
 
 function intersectRayRectangle(rayx,rayy,raya,rectx,recty,rectw,recth,isCam){
+	if(raya < 0){
+		raya += Math.PI * 2 * (Math.floor(Math.abs(raya) / (Math.PI * 2)) + 1);
+	}
 	var angle = raya % (Math.PI * 2),
 		p2 = Math.PI / 2,
 		k = Math.tan(angle), x, y;
@@ -96,27 +99,27 @@ function intersectRayRectangle(rayx,rayy,raya,rectx,recty,rectw,recth,isCam){
 	if(l){ // left
 		y = k * (rectx - rayx) + rayy;
 		if(y >= recty && y <= recty + recth){
-			return {x: rectx, y: y};
+			return {x: rectx, y: y, intersect: !isCam};
 		}
 	}
 	
 	if(u){ // up
 		x = (recty - rayy) / k + rayx;
 		if(x >= rectx && x <= rectx + rectw){
-			return {x: x, y: recty};
+			return {x: x, y: recty, intersect: !isCam};
 		}
 	}
 	
 	if(r){ //right
 		y = k * (rectx + rectw - rayx) + rayy;
 		if(y >= recty && y <= recty + recth){
-			return {x: rectx + rectw, y: y};
+			return {x: rectx + rectw, y: y, intersect: !isCam};
 		}
 	}
 	if(d){ // down
 		x = (recty + recth - rayy) / k + rayx;
 		if(x >= rectx && x <= rectx + rectw){
-			return {x: x, y: recty + recth};
+			return {x: x, y: recty + recth, intersect: !isCam};
 		}
 	}
 	if(!isCam && intersectPointBox(rayx,rayy,camera.x,camera.y,camera.width,camera.height)){
