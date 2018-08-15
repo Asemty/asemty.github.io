@@ -8,11 +8,12 @@ body{
 }
 #tabs .tab {
     display: inline-table; /* выстраиваем вкладки в один ряд */
-    padding: 5px 10px;
+	width: 32%;
+	float: center;
+    //padding: 5px 10px;
     cursor: pointer;
     position: relative;
     z-index: 5;
-	width: 32%;
 	text-align: center;
 	border-bottom: 15px solid gray;
 }
