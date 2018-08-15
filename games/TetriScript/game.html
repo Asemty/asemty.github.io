@@ -1,0 +1,15 @@
+<title>9999999 in 1</title>
+<canvas id="gc" width="600" height="800"></canvas>
+<link rel = "stylesheet" type = "text/css" href = "../../defaultGameStyle.css">
+<script src="main.js"></script>
+<script src="chapter1.js"></script>
+<script src="chapter2.js"></script>
+<script>
+window.onload=function() {
+    canvas=document.getElementById("gc");
+    contex=canvas.getContext("2d");
+    document.addEventListener("keydown",keyPress);
+	start();
+    setInterval(update,1000/45);
+}
+</script>

@@ -13,6 +13,12 @@ function loadContent(){
 	if(gameData != null){
 		var tabsArr = [doc.getElementById("complTab"), doc.getElementById("mteTab"), doc.getElementById("testTab")];
 		for(var i = 0; i < gameData.length && i < tabsArr.length; i++){
+			if(gameData[i].length == 0){
+				var str = doc.createElement("b");
+				str.id = "nothing";
+				str.appendChild(doc.createTextNode("Nothing =("));
+				tabsArr[i].appendChild(str);
+			}
 			for(var j = 0 ; j < gameData[i].length; j++){
 				var elem = gameData[i][j];
 				tabsArr[i].appendChild(genContent(elem,i,j));
@@ -70,4 +76,8 @@ function showTabsContent(b){
 	}
 }
 function gameChoose(c1,c2){
+	if(gameData != null){
+		window.open(gameData[c1][c2].htmlSrc);
+	}
+	
 }

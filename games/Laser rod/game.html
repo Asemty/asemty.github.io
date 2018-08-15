@@ -1,0 +1,19 @@
+<title>Laser Rod</title>
+<center><canvas onmousemove="mousemove(event)" onclick="mouseclick(event,true)" oncontextmenu="mouseclick(event,false)" id="gc" width="1366" height="768"></canvas></center>
+<link rel = "stylesheet" type = "text/css" href = "../../defaultGameStyle.css">
+<script src="src/main.js"></script>
+<script src="src/utils.js"></script>
+<script src="src/research.js"></script>
+<script src="src/builds.js"></script>
+<script src="src/GUI.js"></script>
+<script>
+window.onload=function() {
+    canvas=document.getElementById("gc");
+    ctx=canvas.getContext("2d");
+	document.addEventListener('keydown', function(ev) { return keyPress(ev, true);  }, false);
+	document.addEventListener('keyup',   function(ev) { return keyPress(ev, false); }, false);
+	start();
+	FRAMERATE = 45;
+    setInterval(step,1000 / FRAMERATE);
+}
+</script>
