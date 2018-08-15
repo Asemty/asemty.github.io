@@ -1,11 +1,44 @@
 var tab; // заголовок вкладки
 var tabContent; // блок содержащий контент вкладки
+var doc = document;
  
 window.onload = function(){
-	tabContent = document.getElementsByClassName('tabContent');
-	tab = document.getElementsByClassName('tab');
+	tabContent = doc.getElementsByClassName('tabContent');
+	tab = doc.getElementsByClassName('tab');
 	hideTabsContent(1);
-	
+	loadContent();
+}
+
+function loadContent(){
+	if(gameData != null){
+		var tabsArr = [doc.getElementById("complTab"), doc.getElementById("mteTab"), doc.getElementById("testTab")];
+		for(var i = 0; i < gameData.length && i < tabsArr.length; i++){
+			for(var j = 0 ; j < gameData[i].length; j++){
+				var elem = gameData[i][j];
+				tabsArr[i].appendChild(genContent(elem,i,j));
+			}
+		}
+	}
+}
+function genContent(elem,i,j){
+	/*tabsArr[i].append(
+	"<div class = \"gameIcon\" onclick = \"gameChoose(" + i + "_" + j + ")\"><img class = \"gameImg\" src=\"" + elem.imgSrc +"\"><strong> " + elem.name + " </strong><br><i> " + elem.discription + " </i> </div>");*/
+	var div = doc.createElement("div");
+	div.setAttribute("class", "gameIcon");
+	div.setAttribute("onclick", "gameChoose(" + i + "," + j + ")");
+	var img = doc.createElement("img");
+	img.setAttribute("class", "gameImg");
+	img.setAttribute("src", elem.imgSrc);
+	div.appendChild(img);
+	div.appendChild(doc.createElement("br"));
+	var bold = doc.createElement('strong');
+	bold.appendChild(doc.createTextNode(elem.name))
+	div.appendChild(bold);
+	div.appendChild(doc.createElement("br"));
+	var italic = doc.createElement('i');
+	italic.appendChild(doc.createTextNode(elem.discription))
+	div.appendChild(italic);
+	return div;
 }
 
 function hideTabsContent(a){
@@ -16,7 +49,7 @@ function hideTabsContent(a){
 	}
 }
 
-document.getElementById('tabs').onclick = function (event){
+doc.getElementById('tabs').onclick = function (event){
 	var target = event.target;
 	if (target.classList.contains("tab") && !target.classList.contains("whiteborder")) {
 		for (var i = 0; i < tab.length; i++) {
@@ -36,6 +69,5 @@ function showTabsContent(b){
 		tabContent[b].classList.add('show');
 	}
 }
-function gameChoose(code){
-	document.getElementById('tabs').background = "red";
+function gameChoose(c1,c2){
 }

@@ -7,9 +7,8 @@ body{
 	width: 100%;
 }
 #tabs .tab {
-    display: inline-table; /* выстраиваем вкладки в один ряд */
+    display: inline-block; /* выстраиваем вкладки в один ряд */
 	width: 32%;
-	float: center;
     //padding: 5px 10px;
     cursor: pointer;
     position: relative;
@@ -26,7 +25,8 @@ body{
     top: -1px; 
     z-index:1;
     padding: 50px;
-    border-radius: 0 0 3px 3px
+    border-radius: 0 0 3px 3px;
+	text-align: center;
 }
 #tabs .hide {
     display: none;
@@ -34,26 +34,29 @@ body{
 #tabs .show {
     display: block;
 }
-.test{
-	display: inline-block;
+.gameIcon{
+	display: inline-table;
 	padding: 20px 7px;
 	width: 322px;
-	height: 322px;
+	height: 350px;
 	text-align: center;
 	border: 1px solid gray;
 	border-radius: 25px;
 	background: #f8ffff;
 	font: 25px Palatino, serif;
 	margin-bottom: 10px;
+	margin-left: 10px;
+	cursor: pointer;
+	position: relative;
 }
-.test i{
-	font-size: 20px;
+.gameIcon i{
+	font-size: 17px;
 	color: #0099cc;
 }
-.test:hover{
+.gameIcon:hover{
 	border: 1px solid crimson;
 }
-.img{
+.gameImg{
 	width: 300px;
 	height: 200px;
 	border-radius: 15px;
