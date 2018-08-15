@@ -1,0 +1,59 @@
+body{
+	background: #ffffff;
+	color: black;
+	font: 30px Palatino, serif;
+}
+#tabs{
+	width: 100%;
+}
+#tabs .tab {
+    display: inline-table; /* выстраиваем вкладки в один ряд */
+    padding: 5px 10px;
+    cursor: pointer;
+    position: relative;
+    z-index: 5;
+	width: 32%;
+	text-align: center;
+	border-bottom: 15px solid gray;
+}
+#tabs .whiteborder {
+	border-bottom: 15px solid crimson;
+}
+#tabs .tabContent {
+    height: 92%;
+    position: relative;
+    top: -1px; 
+    z-index:1;
+    padding: 50px;
+    border-radius: 0 0 3px 3px
+}
+#tabs .hide {
+    display: none;
+}
+#tabs .show {
+    display: block;
+}
+.test{
+	display: inline-block;
+	padding: 20px 7px;
+	width: 322px;
+	height: 322px;
+	text-align: center;
+	border: 1px solid gray;
+	border-radius: 25px;
+	background: #f8ffff;
+	font: 25px Palatino, serif;
+	margin-bottom: 10px;
+}
+.test i{
+	font-size: 20px;
+	color: #0099cc;
+}
+.test:hover{
+	border: 1px solid crimson;
+}
+.img{
+	width: 300px;
+	height: 200px;
+	border-radius: 15px;
+}

@@ -1,20 +1,85 @@
-<canvas id="gc" width="1366" height="768"></canvas>
-<script src="map/lvl1.js"></script>
-<script src="src/main.js"></script>
-<script src="src/weapons.js"></script>
-<script src="src/enemies.js"></script>
-<script src="src/utilities.js"></script>
-<script src="src/scenarios.js"></script>
-<script src="src/bosses.js"></script>
-<script>
-window.onload=function() {
-    canvas=document.getElementById("gc");
-    ctx=canvas.getContext("2d");
-    //document.addEventListener("keydown",keyPress);
-	document.addEventListener('keydown', function(ev) { return keyPress(ev, true);  }, false);
-	document.addEventListener('keyup',   function(ev) { return keyPress(ev, false); }, false);
-	start();
-	FRAMERATE = 45;
-    setInterval(update,1000 / FRAMERATE);
-}
-</script>
+<html>
+	<head>
+	<title>Name</title>
+	<link rel = "stylesheet" type = "text/css" href = "style.css">
+	<script src="games.js"></script>
+	</head>
+	<body>
+		<div id = "tabs">
+			<div class = "tab whiteborder t1">Comlited</div>
+			<div class = "tab t2">More then engine</div>
+			<div class = "tab t3">Test</div>
+			<div class = "tabContent t1">
+				<div class = "test" onclick = "gameChoose(1)">
+					<img class = "img" src="img/test.png">
+					<strong> A long text before, ugly ugly textfield </strong><br>
+					<i>First of many of imagination test game of butifun ugly loved discription by world revers inginiring</i>
+				</div>
+				<div class = "test" onclick = "gameChoose(2)">
+					<img class = "img" src="img/test.png" width=300 height=200>
+					<strong> A long text before, ugly ugly textfield </strong><br>
+					<i>First of many of imagination test game of butifun ugly loved discription by world revers inginiring</i>
+				</div>
+				<div class = "test" >
+					<img class = "img" src="img/test.png" width=300 height=200>
+					<strong> A long text before, ugly ugly textfield </strong><br>
+					<i>First of many of imagination test game of butifun ugly loved discription by world revers inginiring</i>
+				</div>
+				<div class = "test" >
+					<img class = "img" src="img/test.png" width=300 height=200>
+					<strong> A long text before, ugly ugly textfield </strong><br>
+					<i>First of many of imagination test game of butifun ugly loved discription by world revers inginiring</i>
+				</div>
+				<div class = "test" >
+					<img class = "img" src="img/test.png" width=300 height=200>
+					<strong> A long text before, ugly ugly textfield </strong><br>
+					<i>First of many of imagination test game of butifun ugly loved discription by world revers inginiring</i>
+				</div>
+				<div class = "test" >
+					<img class = "img" src="img/test.png" width=300 height=200>
+					<strong> A long text before, ugly ugly textfield </strong><br>
+					<i>First of many of imagination test game of butifun ugly loved discription by world revers inginiring</i>
+				</div>
+				<div class = "test" >
+					<img class = "img" src="img/test.png" width=300 height=200>
+					<strong> A long text before, ugly ugly textfield </strong><br>
+					<i>First of many of imagination test game of butifun ugly loved discription by world revers inginiring</i>
+				</div>
+			</div>
+			<div class = "tabContent t2">
+					<div class = "test" >
+					<img class = "img" src="img/test.png" width=300 height=200>
+					<strong> A long text before, ugly ugly textfield </strong><br>
+					<i>First of many of imagination test game of butifun ugly loved discription by world revers inginiring</i>
+				</div>
+				<div class = "test" >
+					<img class = "img" src="img/test.png" width=300 height=200>
+					<strong> A long text before, ugly ugly textfield </strong><br>
+					<i>First of many of imagination test game of butifun ugly loved discription by world revers inginiring</i>
+				</div></div>
+			
+			<div class = "tabContent t3">
+				<div class = "test" >
+					<img class = "img" src="img/test.png" width=300 height=200>
+					<strong> A long text before, ugly ugly textfield </strong><br>
+					<i>First of many of imagination test game of butifun ugly loved discription by world revers inginiring</i>
+				</div>
+				<div class = "test" >
+					<img class = "img" src="img/test.png" width=300 height=200>
+					<strong> A long text before, ugly ugly textfield </strong><br>
+					<i>First of many of imagination test game of butifun ugly loved discription by world revers inginiring</i>
+				</div>
+				<div class = "test" >
+					<img class = "img" src="img/test.png" width=300 height=200>
+					<strong> A long text before, ugly ugly textfield </strong><br>
+					<i>First of many of imagination test game of butifun ugly loved discription by world revers inginiring</i>
+				</div>
+				<div class = "test" >
+					<img class = "img" src="img/test.png" width=300 height=200>
+					<strong> A long text before, ugly ugly textfield </strong><br>
+					<i>First of many of imagination test game of butifun ugly loved discription by world revers inginiring</i>
+				</div></div>
+		</div>
+		<script src = "main.js"></script>
+	</body>
+</html>
