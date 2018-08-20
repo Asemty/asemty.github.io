@@ -1,4 +1,4 @@
-class Genetic extends Part{
+﻿class Genetic extends Part{
 	constructor(){
 		super("Genetic");
 	}
@@ -134,5 +134,211 @@ class Cell{
 
 	static extinction(uc,c1){
 		return ((uc.r && Math.random()*16>c1.colorR) || (uc.g && Math.random()*16>c1.colorG) || (uc.b && Math.random()*16>c1.colorB)) && Math.random()>0.8;
+	}
+}
+
+class Minefield extends Part{
+	constructor(){
+		super("Minefield");
+	}
+	start(){
+		var enteredDiff = prompt("Сложность: (0-5)");
+		while(true){
+			if(enteredDiff>=0 && enteredDiff<=5 || enteredDiff == -5){
+				this.dif = (13 + 2 * enteredDiff) / 100;
+				break;
+			}else{
+				enteredDiff = prompt("Неверный ввод! Попробуйте ещё раз.\nСложность: (0-5)");
+			}
+		}
+		this.cells = [];
+		this.nextCells = [];
+		this.w = 15 + enteredDiff * 2;
+		this.size = canvas.width / this.w;
+		this.h = Math.floor(canvas.height / this.size) - 1;
+		this.offset = (canvas.height - this.size * (this.h + 1)) / 2;
+		this.cursor = {x: 0, y: 0};
+		this.data = {mine: 0, flaged: 0, opened: 0, cellsNumb: this.w * this.h};
+		this.gameIsOver = false;
+		
+		for(var i = 0; i < this.w; i++){
+			this.cells[i] = [];
+			for(var j = 0; j < this.h; j++){
+				var push = Math.random() <= this.dif;
+				if(push) this.data.mine++;
+				this.cells[i][j] = {flaged: false, opened: false, mine: push ? -1: 0};
+			}
+		}
+		for(var i = 0; i < this.w; i++){
+			for(var j = 0; j < this.h; j++){
+				if(this.cells[i][j].mine == 0){
+					var l = i > 0, r = i < this.w - 1, u = j > 0, d = j < this.h - 1;
+					this.cells[i][j].mine = 
+					((l && this.cells[i - 1][j].mine == -1) ? 1 : 0) +
+					((r && this.cells[i + 1][j].mine == -1) ? 1 : 0) +
+					((u && this.cells[i][j - 1].mine == -1) ? 1 : 0) +
+					((d && this.cells[i][j + 1].mine == -1) ? 1 : 0) +
+					((l && u && this.cells[i - 1][j - 1].mine == -1) ? 1 : 0) +
+					((l && d && this.cells[i - 1][j + 1].mine == -1) ? 1 : 0) +
+					((r && u && this.cells[i + 1][j - 1].mine == -1) ? 1 : 0) +
+					((r && d && this.cells[i + 1][j + 1].mine == -1) ? 1 : 0);
+				}
+			}
+		}
+	}
+	update(){
+		contex.fillStyle="#111111";
+		contex.fillRect(0,0,canvas.width,canvas.height);
+		contex.font = "bold " + Math.floor(this.size / 2) + "px arial,serif";
+		for(var i = 0; i < this.w; i++){
+			for(var j = 0; j < this.h; j++){
+				if(!this.cells[i][j].opened && !(this.gameIsOver && !(this.cells[i][j].flaged && this.cells[i][j].mine == -1))){
+					contex.fillStyle = "darkGray";
+					contex.fillRect(i * this.size, j * this.size,this.size,this.size);
+					contex.fillStyle = "#7dd";
+					contex.fillRect(i * this.size + 1, j * this.size + 1 ,this.size - 2,this.size - 2);
+					if(this.cells[i][j].flaged){
+						contex.strokeStyle = "black";
+						this.drawFlag(i * this.size, j * this.size)
+					}
+				}else{
+					contex.fillStyle = "darkGray";
+					contex.fillRect(i * this.size, j * this.size,this.size,this.size);
+					contex.fillStyle = "#dff";
+					contex.fillRect(i * this.size + 1, j * this.size + 1 ,this.size - 2,this.size - 2);
+					if(this.cells[i][j].mine == -1){
+						contex.fillStyle = "red";
+						contex.fillRect(i * this.size + this.size / 4, j * this.size  + this.size / 4 , this.size / 2, this.size / 2);
+					}else if(this.cells[i][j].mine != 0){
+						contex.fillStyle = "#333";
+						contex.fillText(this.cells[i][j].mine, (i + 0.4) * this.size, (j + 0.7) * this.size );
+					}
+				}
+				if(this.cursor.x == i && this.cursor.y == j ){
+					contex.lineWidth = 5;
+					contex.strokeStyle = "crimson";
+					contex.strokeRect(i * this.size + 3, j * this.size + 3, this.size - 6, this.size - 6);
+				}
+				/*for(var c =0; c < this.nextCells.length; c++){
+					if(this.nextCells[c][0] == i && this.nextCells[c][1] == j ){
+						contex.lineWidth = 5;
+						contex.strokeStyle = "green";
+						contex.strokeRect(i * this.size + 3, j * this.size + 3, this.size - 6, this.size - 6);
+					}
+				}*/
+			}
+		}
+		contex.font = "bold " + Math.min(this.size, 21) + "px arial,serif";
+		contex.fillStyle = "#ddd";
+		contex.fillText("Arrow: move, Space: open, F: flag, R: restart " + (this.data.mine - this.data.flaged) + " bombs left",0, canvas.height - this.offset);
+		if(this.nextCells.length != 0){
+			var oc = this.nextCells;
+			this.nextCells = [];
+			for(var i = 0; i < oc.length ; i++){
+				this.openCell(oc[i][0],oc[i][1]);
+			}
+		}
+		if(this.gameIsOver == 2) this.gameOver();
+		if(this.gameIsOver == 1) this.gameIsOver = 2;
+	}
+	keyPress(evt){
+		super.keyPress(evt);
+		switch(evt.keyCode) {
+			case 32:
+				//space();
+				this.openCell(this.cursor.x,this.cursor.y)
+				break;
+			case 70:
+				//f();
+				this.placeFlag(this.cursor.x,this.cursor.y);
+				break;
+			case 82:
+				//r();
+				this.start();
+				break;
+			case 38:
+				//up();
+				this.cursor.y--;
+				if(this.cursor.y == -1){
+					this.cursor.y = this.h - 1;
+				}
+				break;
+			case 40:
+				//down();
+				this.cursor.y++;
+				if(this.cursor.y == this.h){
+					this.cursor.y = 0;
+				}
+				break;
+			case 37:
+				//left();
+				this.cursor.x--;
+				if(this.cursor.x == -1){
+					this.cursor.x = this.w - 1;
+				}
+				break;
+			case 39:
+				//right();
+				this.cursor.x++;
+				if(this.cursor.x == this.w){
+					this.cursor.x = 0;
+				}
+				break;
+		}
+	}
+	openCell(x,y){
+		if(x > -1 && x < this.w && y > -1 && y < this.h){
+			var cell = this.cells[x][y];
+			if(!cell.opened){
+				if(cell.mine == -1){
+					if(this.data.flaged == 0 && this.data.opened == 0){
+						this.placeFlag(x, y);
+					}else this.gameIsOver = 1;
+				}else {
+					if(cell.flaged) this.placeFlag(x, y);
+					cell.opened = true;
+					this.data.opened ++;
+					if(cell.mine == 0){
+						this.nextCells.push([x - 1,y - 1]);
+						this.nextCells.push([x - 1,y]);
+						this.nextCells.push([x - 1,y + 1]);
+						this.nextCells.push([x,y - 1]);
+						this.nextCells.push([x,y + 1]);
+						this.nextCells.push([x + 1,y - 1]);
+						this.nextCells.push([x + 1,y]);
+						this.nextCells.push([x + 1,y + 1]);
+					}
+					if(this.data.opened == this.data.cellsNumb - this.data.mine){
+						alert("Вы выжили! Попробуете ещё раз?");
+						this.start();
+					}
+				}
+			}
+		}
+		
+	}
+	
+	placeFlag(x, y){
+		var cell = this.cells[x][y];
+		if(!cell.opened){
+			cell.flaged = !cell.flaged;
+			this.data.flaged += cell.flaged ? 1 : -1;
+		}
+	}
+	drawFlag(x,y){
+		contex.lineWidth = this.size / 25;
+		var s = this.size;
+		contex.beginPath();
+		contex.moveTo(x + s * 0.23, y + s * 0.81)
+		contex.lineTo(x + s * 0.23, y + s * 0.19)
+		contex.lineTo(x + s * 0.5, y + s * 0.19)
+		contex.lineTo(x + s * 0.69, y + s * 0.3)
+		contex.lineTo(x + s * 0.5, y + s * 0.41)
+		contex.lineTo(x + s * 0.23, y + s * 0.41)
+		contex.stroke();
+	}
+	gameOver(){
+		alert("Мне жаль, но вы погибли(")
+		this.start();
 	}
 }

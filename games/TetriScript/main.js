@@ -5,6 +5,7 @@
 		this.games.push(new LightCycle());
 		this.games.push(new Tetris());
 		this.games.push(new Genetic());
+		this.games.push(new Minefield());
 		this.currentMenuItem=0;
 	}
 	keyPress(evt){
