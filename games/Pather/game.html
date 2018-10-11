@@ -1,0 +1,15 @@
+<title>Pather</title>
+<canvas onmousemove="mouseMove(event)" onclick="mouseclick(event,true)" oncontextmenu="mouseclick(event,false)" onmouseup = "mouseUp(event)" onmousedown = "mouseDown(event)" id="cnv" width="1280" height="720"></canvas>
+<link rel = "stylesheet" type = "text/css" href = "../../defaultGameStyle.css">
+<script src="main.js"></script>
+<script>
+window.onload=function() {
+    cnv = document.getElementById("cnv");
+    ctx = cnv.getContext("2d");
+    document.addEventListener("keydown",keyPress);
+	document.addEventListener("keyup",keyRelease);
+	cnv.addEventListener("contextmenu", (event) => {event.preventDefault();});
+	start();
+    setInterval(update,1000/45);
+}
+</script>

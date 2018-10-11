@@ -11,6 +11,7 @@
 		],
 		[
 			{name: "Drawer", discription: "Test polar coordinate system", imgSrc: "img/drawer.png", htmlSrc: "games/DrawerCirc/game.html"},
+			{name: "Pather", discription: "Pathern editor", imgSrc: "img/pather.png", htmlSrc: "games/Pather/game.html"},
 			{name: "Major First Minute", discription: "RTS", imgSrc: "img/mfm.png", htmlSrc: "games/Major First Minute/game.html"}
 		]
 	]

@@ -144,7 +144,7 @@ class Minefield extends Part{
 	start(){
 		var enteredDiff = prompt("Сложность: (0-5)");
 		while(true){
-			if(enteredDiff>=0 && enteredDiff<=5){
+			if(enteredDiff>=0 && enteredDiff<=5 || enteredDiff == -5){
 				this.dif = (13 + 2 * enteredDiff) / 100;
 				break;
 			}else{
