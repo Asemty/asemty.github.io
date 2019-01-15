@@ -173,15 +173,15 @@ function setupWalkerTank(x, y){
 				this.state = this.states.jump;
 			}
 		}*/
-		if(player.lookdown){
-			/*if(this.tmpData != this.isLeft){
+		/*if(player.lookdown){
+			if(this.tmpData != this.isLeft){
 				this.flip();
 				this.tmpData = this.isLeft;
-			}*/
+			}
 			entity.granadeAttack();
 		}else{
 			//this.tmpData = !this.isLeft;
-		}
+		}*/
 		
 		lul.ox = (ldl.ox + this.ox) / 2;
 		rul.ox = (rdl.ox + this.ox) / 2;
@@ -211,7 +211,7 @@ function setupWalkerTank(x, y){
 			this.isLeft = side == -1
 		}
 	}
-	entity.granadeAttack = function(){
+	entity.granadeAttack = function(){//граната, создающая огненную волну
 		var dx = (player.x + player.width / 2 - (this.x + this.width / 2)) / (- 3 / GRAVITY * 2);
 		var bullet = createFallingShot(this.x, this.y, -dx, -3);
 		bullet.onDead = function(){
@@ -230,7 +230,7 @@ function setupWalkerTank(x, y){
 			drawImg(images["enemy1"].img, 8 * Math.floor((this.timer - 1) / 3), 16, 8, 8, this.x - camera.x, this.y - camera.y, this.width, this.height)
 		}
 	}
-	entity.throwGranade = function(){
+	entity.throwGranade = function(){//выстрел 5ю гранатами, с направленным вверх взрывом
 				var maxNum = 5;
 				for(var num = 0; num < maxNum; num++){
 					var left = (this.x + this.width / 2) < (camera.x + camera.width / 2)

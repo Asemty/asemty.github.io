@@ -1,8 +1,9 @@
-<!DOCTYPE html>
 <title>Name</title>
-<canvas onmousemove="mouseMove(event)" onmouseup = "mouseUp(event)" onmousedown = "mouseDown(event)"  id="cnv" width="1280" height="720"></canvas>
+<canvas onmousemove="mouseMove(event)" onclick="mouseclick(event,true)" oncontextmenu="mouseclick(event,false)" onmouseup = "mouseUp(event)" onmousedown = "mouseDown(event)"  id="cnv" width="1280" height="720"></canvas>
 <link rel = "stylesheet" type = "text/css" href = "../../defaultGameStyle.css">
 <script src="main.js"></script>
+<script src="objects.js"></script>
+<script src="graphic.js"></script>
 <script>
 window.onload=function() {
     cnv = document.getElementById("cnv");

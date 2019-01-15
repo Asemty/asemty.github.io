@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<title>Name</title>
+<title>Kars</title>
 <canvas onmousemove="mouseMove(event)" onmouseup = "mouseUp(event)" onmousedown = "mouseDown(event)"  id="cnv" width="1280" height="720"></canvas>
 <link rel = "stylesheet" type = "text/css" href = "../../defaultGameStyle.css">
 <script src="main.js"></script>
@@ -7,6 +7,7 @@
 window.onload=function() {
     cnv = document.getElementById("cnv");
     ctx = cnv.getContext("2d");
+	ctx.imageSmoothingEnabled = false;
     document.addEventListener("keydown",keyPress);
 	document.addEventListener("keyup",keyRelease);
 	cnv.addEventListener("contextmenu", (event) => {event.preventDefault();});

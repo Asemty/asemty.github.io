@@ -1,4 +1,5 @@
 scenarios = [];
+scenarios.data = [];
 scenarios["lvl1"] ={
 	start: function(){
 			this.killFirstBoss = false;
@@ -39,8 +40,8 @@ scenarios["lvl1"] ={
 	}
 }
 function drawDropArrow(x, y){
-	if(typeof arrowSprite === "undefined"){
-		var arrowSprite = {img: images["enemy1"].img, ox: 0, oy: 24, ow: 8, oh: 8, width: 8, height: 8}
+	if(typeof scenarios.data.arrowSprite === "undefined"){
+		scenarios.data.arrowSprite = {img: images["enemy1"].img, ox: 0, oy: 24, ow: 8, oh: 8, width: 8, height: 8}
 	}
-	drawSprite(arrowSprite, x - camera.x, y - camera.y);
+	drawSprite(scenarios.data.arrowSprite, x - camera.x, y - camera.y);
 }

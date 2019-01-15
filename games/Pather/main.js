@@ -1,8 +1,12 @@
 ﻿function keyPress(evt){
 	switch(evt.keyCode) {
-        case 37 : break; //left
+        case 37 : mirrored = !mirrored; break; //left
 		case 38 : fieldFill(field, 0); break; //up
-		case 39 : break; //right
+		case 39 : 
+			if(++colorIndex == colors.length){
+				colorIndex = 1;
+			}
+			break; //right
 		case 40 : enterProperties(); break; //down
 	}
 }
@@ -13,6 +17,7 @@ function mouseUp(e){
 	switch (e.button) {
 		case 0: // Primary button ("left")
 		mouseButtons[0] = false;
+		
 		break;
 		case 2: // Secondary button ("right")
 		mouseButtons[1] = false;
@@ -40,9 +45,9 @@ function mouseMove(evt){
 		}
 	}else if(mouseButtons[0]){
 		if(oldMouseButtons[0]){
-			fieldDrawLine(field, x - drawFieldCoord.x, y - drawFieldCoord.y, oldMousePos[0] - drawFieldCoord.x, oldMousePos[1] - drawFieldCoord.y, 1, 1);
+			fieldDrawLine(field, x - drawFieldCoord.x, y - drawFieldCoord.y, oldMousePos[0] - drawFieldCoord.x, oldMousePos[1] - drawFieldCoord.y, 1, colorIndex);
 		}else{
-			fieldDrawCircle(field, x - drawFieldCoord.x, y - drawFieldCoord.y, 1, 1);
+			fieldDrawCircle(field, x - drawFieldCoord.x, y - drawFieldCoord.y, 1, colorIndex);
 		}
 	}
 	oldMouseButtons[0] = mouseButtons[0];
@@ -75,8 +80,10 @@ function start(){
 	mouseButtons = [false,false];
 	oldMouseButtons = [false,false];
 	oldMousePos = [0,0];
-	
+	mirrored = true;
+	colorIndex = 1;
 	setProperties(64, 6, 4);
+	alert("Вверх - отчистить экран\nВниз - настройки сетки\nВлево - изменить отражение\nВправо - сменить цвет\n");
 }
 function setProperties(grdSz,fldW,fldH){
 	gridSize = grdSz, fieldWidth = fldW, fieldHeight = fldH;
@@ -117,7 +124,11 @@ function startFieldGen(w,h){
 function colorsGen(){
 	colors = [
 		[0,0,0,false], // empty
-		[68,68,68,true] // gray
+		[68,68,68,true], // gray
+		[255,68,68,true], // red
+		[68,68,255,true], // blue
+		[68,255,68,true], // green
+		[255,255,255,true] // white
 	];
 }
 function drawGrid(){
@@ -146,7 +157,7 @@ function drawFields(){
 		yy = Math.floor(drawFieldCoord.y / drawFieldCoord.height) + 1;
 		for(var i = -xx; i <= xx; i++ )
 			for(var j = -yy; j <= yy; j++ )
-				drawField(drawFieldCoord.x + drawFieldCoord.width * i,drawFieldCoord.y + drawFieldCoord.height * j, field, Math.abs(i) % 2 == 1, Math.abs(j) % 2 == 1);
+				drawField(drawFieldCoord.x + drawFieldCoord.width * i,drawFieldCoord.y + drawFieldCoord.height * j, field, Math.abs(i) % 2 == 1 && mirrored, Math.abs(j) % 2 == 1 && mirrored);
 				
 }
 function drawField( x, y, field, xFlip, yFlip){

@@ -1,18 +1,16 @@
 function setupEnemy(entity){
 	entity.update = function(){
-	//entity.cantDead - взаимодействие со снарядами игрока
-	//entity.canLeaveScreen - может покинуть экран
-	//entity.cantKill - взаимодействие с игроком
+	//entity.cantDead - не умирает от снарядов игрока(по умолчанию - умирает)
+	//entity.canLeaveScreen - может покинуть экран и выжить(по умолчанию погибает покинув экран)
+	//entity.cantKill - не способен убить игрока(по умолчанию способен)
 	//entity.notNeedPhisic - падение, скорость и т.п.
-		var onCameraSquare = this.x + this.width > camera.x - camera.width / 3 
+	
+		/*var onCameraSquare = this.x + this.width > camera.x - camera.width / 3 
 			&& this.x < camera.x + camera.width + camera.width / 3 
 			&& this.y + this.height > camera.y - camera.height / 3 
-			&& this.y < camera.y + camera.height + camera.height / 3;
-		if(onCameraSquare){
-			this.onScreen = this.x + this.width > camera.x 
-			  && this.x < camera.x + camera.width 
-			  && this.y + this.height  > camera.y
-			  && this.y < camera.y + camera.height;
+			&& this.y < camera.y + camera.height + camera.height / 3;*/
+		if(onBigScreen(this)){
+			this.onScreen = onScreen(this);
 			if(!this.notNeedPhisic)updateEntity(this);
 			if(!this.dead){
 				if(this.ai){
@@ -41,11 +39,13 @@ function setupEnemy(entity){
 				}
 				if(!this.dead 
 				&& !this.canLeaveScreen 
-				&& !(this.x + this.width > camera.x - camera.width / 3
-				  && this.x < camera.x + camera.width + camera.width / 3
-				  && this.y + this.height > camera.y - camera.height / 3
-				  && this.y < camera.y + camera.height + camera.height / 3)){
+				&& !onBigScreen(this)){
 					this.dead = true;
+					if(!debug.deadOutScreen){
+						debug.deadOutScreen = 1;
+					}else{
+						debug.deadOutScreen += 1;
+					}
 				}
 			}else{
 				if(!this.deathCounter){
@@ -67,7 +67,7 @@ function setupSoldier(entity, obj){
 	if(typeof gSoldier === 'undefined'){
 		gSoldier = {};
 		gSoldier.standAnim = {spd: 0, pic: images["enemy1"], frames: [[0,0]]};
-		gSoldier.runAnim = {spd: 0.3, pic: images["enemy1"], frames: [[0,0],[1,0],[2,0],[3,0]]};
+		gSoldier.runAnim = {spd: 0.3, pic: images["enemy1"], frames: [[0,0],[1,0],[2,0],[1,0]]};
 		gSoldier.jumpAnim = {spd: 0, pic: images["enemy1"], frames: [[1,0]]};
 		
 		gSoldier.ai = {};
@@ -175,7 +175,26 @@ function setupSoldier(entity, obj){
 		createDecorExplosion(this.x, this.y, 8, 8, 3);
 	}
 }
-function createDecorExplosion(x,y,w,h,delay){
+function setupSpawner(entity, obj){
+	entity.template = obj;
+	entity.spawnCounter = 0;
+	entity.update = function(){
+		var onBigSquare = onBigScreen(this);
+		if(onBigSquare){
+			  if(!onScreen(this)){
+			  this.spawnCounter ++;
+				if(this.spawnCounter > 100){
+					var children = setupEntity(this.template,this.template.properties.spawn);//если не передать имя спаунер будет создавать спаунеры
+					children.lookLeft = player.x < this.x;
+					enemies.push(children);
+					this.spawnCounter = 0;
+				}
+			  }
+		}
+	}
+}
+
+function createDecorExplosion(x,y,w,h,delay){//взрыв при смерти вражеского солдата. Не убивает игрока.
 	var explosion = {};
 	explosion.x = x;
 	explosion.y = y;
@@ -194,8 +213,7 @@ function createDecorExplosion(x,y,w,h,delay){
 	}
 	enemies.push(explosion);
 }
-
-function createDirectedShot(x,y){
+function createDirectedShot(x,y){//выстрел бегающе-стреляющего и стоящего солдата
 		bullet = {};
 		bullet.x = x;
 		bullet.y = y;
@@ -219,37 +237,12 @@ function createDirectedShot(x,y){
 			this.y += Math.sin(this.angle) * this.speed;
 		}
 		bullet.render = function(){
-			drawImg(images["enemy1"].img, 42, 2, 4, 4, this.x - camera.x, this.y - camera.y, this.width, this.height)
+			drawImg(images["enemy1"].img, 34, 2, 4, 4, this.x - camera.x, this.y - camera.y, this.width, this.height)
 		}
 		enemies.push(bullet);
 		return bullet;
 }
-function setupSpawner(entity, obj){
-	entity.template = obj;
-	entity.spawnCounter = 0;
-	entity.update = function(){
-		var onBigSquare = this.x + this.width > camera.x - camera.width / 3 
-			&& this.x < camera.x + camera.width + camera.width / 3 
-			&& this.y + this.height > camera.y - camera.height / 3 
-			&& this.y < camera.y + camera.height + camera.height / 3;
-		if(onBigSquare){
-			var onScreen = this.x + this.width > camera.x 
-			  && this.x < camera.x + camera.width 
-			  && this.y + this.height  > camera.y
-			  && this.y < camera.y + camera.height;
-			  if(!onScreen){
-			  this.spawnCounter ++;
-				if(this.spawnCounter > 100){
-					var children = setupEntity(this.template,this.template.properties.spawn);
-					children.lookLeft = player.x < this.x;
-					enemies.push(children);
-					this.spawnCounter = 0;
-				}
-			  }
-		}
-	}
-}
-function createFireExplode(x,y,delay){//x и y-центр взрыва
+function createFireExplode(x,y,delay){//x и y-центр взрыва, просто взрыв с возможностью дополнительного действия
 	explode = {};
 	explode.x = x - 4;
 	explode.y = y - 4;
@@ -283,7 +276,7 @@ function createFireExplode(x,y,delay){//x и y-центр взрыва
 	enemies.push(explode);
 	return explode;
 }
-function createFallingShot(x,y,dx,dy){
+function createFallingShot(x,y,dx,dy){//снаряд, летящий по параболической траектории
 		bullet = {};
 		bullet.x = x;
 		bullet.y = y;
@@ -308,8 +301,7 @@ function createFallingShot(x,y,dx,dy){
 		enemies.push(bullet);
 		return bullet;
 }
-
-function createMovingFire(x,y,delay, maxPhase, left, createPhase){
+function createMovingFire(x,y,delay, maxPhase, left, createPhase){//maxPhase - на которой огонь тухнет, createPhase - на которой создаёт новый огонь,delay - время одной фазы
 	explode = {};
 	explode.x = x;
 	explode.y = y;

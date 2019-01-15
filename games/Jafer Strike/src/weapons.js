@@ -74,6 +74,7 @@
 			bullet.v = v;
 			bullet.spd = 4;
 			bullet.dmg = 2;
+			bullet.notOneOff = true;
 			if(h!= 0 && v!=0){
 				bullet.spd = Math.sqrt((bullet.spd * bullet.spd) / 2);
 			}
@@ -119,7 +120,7 @@
 				if(this.isDead){
 					explode = createExplode(this.prevx + 2 ,this.prevy + 2, 5);
 					explode.additionalEvent = function(){
-						var size = 8;
+						var size = 12;
 						var x1 = this.x + 4 + Math.sin(this.explPhase * Math.PI / 3) * size;
 						var y1 = this.y + 4 + Math.cos(this.explPhase * Math.PI / 3) * size;
 						var x2 = this.x + 4 + Math.sin(this.explPhase * Math.PI / 3 + Math.PI) * size;
@@ -134,7 +135,7 @@
 	}}
 	weapons.push(explosiveGun);
 	
-	var waveGun = {auto: false, shot: function(player,h,v){
+	var waveGun = {auto: false, delay: 7, shot: function(player,h,v){
 		if(player.bullets.length < 3 && player){
 			bullet = {};
 			bullet.x = player.x;

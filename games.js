@@ -7,7 +7,8 @@
 		],
 		[
 			{name: "Jafer Strike", discription: "Platformer with one boss", imgSrc: "img/Jafer Strike.png", htmlSrc: "games/Jafer Strike/game.html"},
-			{name: "Laser rod", discription: "Top-Down engineering survival with energy manipulation ", imgSrc: "img/Laser rod.png", htmlSrc: "games/Laser rod/game.html"}
+			{name: "Laser rod", discription: "Top-Down engineering survival with energy manipulation ", imgSrc: "img/Laser rod.png", htmlSrc: "games/Laser rod/game.html"},
+			{name: "RPG test battle", discription: "Test rytm-battle mechanic", imgSrc: "img/testbattle.png", htmlSrc: "games/Test RPG fight/game.html"}
 		],
 		[
 			{name: "Drawer", discription: "Test polar coordinate system", imgSrc: "img/drawer.png", htmlSrc: "games/DrawerCirc/game.html"},

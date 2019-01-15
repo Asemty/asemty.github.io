@@ -49,10 +49,18 @@ function mouseMove(evt){
 }
 
 function update(){
-	ctx.fillStyle="#eeeeee";
+	ctx.fillStyle="#eee";
     ctx.fillRect(0,0,cnv.width,cnv.height);
-	if(isKey("down"))ctx.fillStyle = "#222222"; else ctx.fillStyle = "#ff0000";
-    ctx.fillRect(-3 + mouse.x,-3 + mouse.y,6,6);
+	
+	for(var i = 0; i < 5; i++){
+		for(var j = 0; j < 6; j++){
+			ctx.fillStyle="#222";
+			ctx.fillRect((card.width + 10) * i + 720, (card.height + 10 ) * j + 10 +(j >= 2 ? 50 : 0), card.width,card.height);
+		}
+		
+	}
+	
+	
 	ctx.font="20px Georgia";
 	ctx.fillStyle="red";
 	ctx.fillText("Hello world!",10,25);
@@ -67,4 +75,9 @@ function start(){
 	buttons.push({id: 40, name: "down", isPressed: false});
 	img = new Image();
 	img.src = "images/player.png"
+	
+	card = {width: 100, height: 100}
+	
+	field = []
+	
 }
