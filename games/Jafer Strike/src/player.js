@@ -96,7 +96,7 @@ function setupPlayer(entity, obj){
 		this.immune = FRAMERATE * 2;
 	}
 	entity.deadTimer = 0;
-	entity.live = 200;
+	entity.live = 3;
 }
 function renderPlayer(){
 	if(player){

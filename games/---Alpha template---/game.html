@@ -1,16 +1,25 @@
 <!DOCTYPE html>
 <title>Name</title>
-<canvas onmousemove="mouseMove(event)" onmouseup = "mouseUp(event)" onmousedown = "mouseDown(event)"  id="cnv" width="1280" height="720"></canvas>
+<canvas id="cnv" width="1280" height="720"></canvas>
 <link rel = "stylesheet" type = "text/css" href = "../../defaultGameStyle.css">
+<script> //preload
+	preupdate = [];
+	postupdate = [];
+</script>
+<script src="../scripts/input.js"></script>
 <script src="main.js"></script>
 <script>
 window.onload=function() {
     cnv = document.getElementById("cnv");
     ctx = cnv.getContext("2d");
-    document.addEventListener("keydown",keyPress);
-	document.addEventListener("keyup",keyRelease);
-	cnv.addEventListener("contextmenu", (event) => {event.preventDefault();});
+	ctx.imageSmoothingEnabled = false;
 	start();
     setInterval(update,1000/45);
+};
+function update(){
+	preupdate.forEach((fun)=>{fun()});
+	step();
+	draw();
+	postupdate.forEach((fun)=>{fun()});
 }
 </script>

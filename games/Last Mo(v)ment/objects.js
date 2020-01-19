@@ -31,7 +31,7 @@ function getPlayer(x,y){
 			this.y += Math.sin(this.angle + Math.PI) * this.moveSpeed * 0.35;
 			this.x += Math.cos(this.angle + Math.PI) * this.moveSpeed * 0.35;
 		}
-		if(isKeyPressed("space")){
+		if(isKey("space")){
 			this.shoot();
 		}
 		if(this.shotTime > 0){
@@ -46,10 +46,11 @@ function getPlayer(x,y){
 		drawRotatedImage(arrow,0,0,40,51,this.x,this.y,40,51,this.angle + d90,20,31);
 	};
 	res.shoot = function() {
-		//if(this.shotTime <= 0){
+		if(this.shotTime <= 0){
+			
 			gameObjects.push(getBullet(this.x,this.y, this.angle));
-			//this.shotTime = this.reloadTime;
-		//}
+			this.shotTime = this.reloadTime;
+		}
 		
 	}
 	return res;

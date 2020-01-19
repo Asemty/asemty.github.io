@@ -17,7 +17,7 @@
 	addImage("images/enemy1.png","enemy1",8,8);
 	addImage("images/bosses.png","bosses");
 	debug = {};
-	debug.immortal = true;
+	debug.immortal = false;
 	startGame();
 	
 	/////////////////////Temp////////////////////

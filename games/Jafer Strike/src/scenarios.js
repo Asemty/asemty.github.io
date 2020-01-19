@@ -41,7 +41,7 @@ scenarios["lvl1"] ={
 }
 function drawDropArrow(x, y){
 	if(typeof scenarios.data.arrowSprite === "undefined"){
-		scenarios.data.arrowSprite = {img: images["enemy1"].img, ox: 0, oy: 24, ow: 8, oh: 8, width: 8, height: 8}
+		scenarios.data.arrowSprite = {img: images["enemy1"].img, ox: 8 * 6, oy: 8, ow: 8, oh: 8, width: 8, height: 8}
 	}
 	drawSprite(scenarios.data.arrowSprite, x - camera.x, y - camera.y);
 }
