@@ -16,7 +16,7 @@
 			{name: "Kars", discription: "Ride & Gun", imgSrc: "img/kars.png", htmlSrc: "games/Kars/game.html"},
 			{name: "Last Mo(v)ment", discription: "Top down", imgSrc: "img/lmv.png", htmlSrc: "games/Last Mo(v)ment/game.html"},
 			{name: "Laser rod", discription: "Top-Down engineering survival with energy manipulation ", imgSrc: "img/Laser rod.png", htmlSrc: "games/Laser rod/game.html"},
-			{name: "Difficult calc", discription: "Калькулятор для расчёта времени изучения призываемого предмета (DnD) ", imgSrc: "img/Laser rod.png", htmlSrc: "games/difcalc/game.html"}
+			{name: "Difficult calc", discription: "Калькулятор для расчёта времени изучения призываемого предмета (DnD) ", imgSrc: "img/difcalc.png", htmlSrc: "games/difcalc/game.html"}
 		]
 	]
 );
