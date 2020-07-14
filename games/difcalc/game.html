@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<title>Как долго я буду изучать этот предмет?</title>
+<body>
+<b>На сколько он сложный?</b>
+<input name = "r1" type = "radio" onclick="fun();" checked = "true" value = "0"> Нормальный
+<input name = "r1" type = "radio" onclick="fun();" value = "1"> Сложный
+<input name = "r1" type = "radio" onclick="fun();" value = "2"> Очень сложный
+<br>
+<b>Как далеко он находится?</b>
+<input name = "r2" type = "radio" onclick="fun();" checked = "true" value = "0"> В руках
+<input name = "r2" type = "radio" onclick="fun();" value = "1"> В пределах 60 фт
+<input name = "r2" type = "radio" onclick="fun();" value = "2"> Далее 60 фт
+<br>
+<b>Видел что-то подобное раньше?</b>
+<input name = "r3" type = "checkbox" onclick="fun();" value = "-1">
+<br>
+<b>Он за чем-то спрятан?</b>
+<input name = "r4" type = "checkbox" onclick="fun();" value = "1">
+<br>
+<b>Итого изучение займёт: </b> <div id="div"></div>
+</body>
+<script> 
+	dificult = ["1 действие","1 действие","1 минута","10 минут","4 часа","вечность"];
+	document.getElementById("div").innerHTML = dificult[1];
+	function fun(){
+		var r1 = document.getElementsByName("r1");
+		var r2 = document.getElementsByName("r2");
+		var r3 = document.getElementsByName("r3");
+		var r4 = document.getElementsByName("r4");
+		var res = 1;
+		for(var i = 0; i < r1.length; i++){
+			if(r1[i].checked){
+				res += parseInt(r1[i].value);
+			}
+		}
+		for(var i = 0; i < r2.length; i++){
+			if(r2[i].checked){
+				res += parseInt(r2[i].value);
+			}
+		}
+		if(r3[0].checked)res += parseInt(r3[0].value);
+		if(r4[0].checked)res += parseInt(r4[0].value);
+		document.getElementById("div").innerHTML = dificult[res];
+	}	
+</script>
