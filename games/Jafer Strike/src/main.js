@@ -18,6 +18,8 @@
 	addImage("images/bosses.png","bosses");
 	debug = {};
 	debug.immortal = false;
+	
+	alert("WASD или стрелки-движение, J/Z-прыжок, H/X-стрельба, F/ENTER-циклическая смена оружия");
 	startGame();
 	
 	/////////////////////Temp////////////////////
@@ -68,6 +70,7 @@ function setupEntity(obj, name) {
     entity.dx		= 0;
     entity.dy		= 0;
     entity.start    = { x: obj.x, y: obj.y }
+	fixNewSaveVersion(obj);
 	if(obj.properties) entity.lookLeft = obj.properties.lookLeft;
 	if(!name){
 		var name = obj.name;
@@ -78,6 +81,14 @@ function setupEntity(obj, name) {
 		case "spawner": setupSpawner(entity, obj); break;
 	}
     return entity;
+}
+
+function fixNewSaveVersion(obj){
+	if(obj.properties){
+		for(var el = 0; el < obj.properties.length; el++){
+			obj.properties[obj.properties[el].name] = obj.properties[el].value;
+		}
+	}
 }
 
 function update(){
@@ -274,17 +285,18 @@ function renderHUD(){
 	}
 	var p = icell(player.currentGun + 1,4);
 	drawImg(images["hud"].img, 8*p.x, 8*p.y, 8, 8, 2, 10, 8, 8);
-	ctx.fillStyle = "#fff";
+	/*ctx.fillStyle = "#fff";
 	ctx.fillText(debug.deadOutScreen,5,20);
 	if(camera.x < camera.width){
 		ctx.fillStyle = "#fff";
 		ctx.font="bold 3px arial";
 		ctx.fillText("WASD или стрелки-движение, J/Z-прыжок, H/X-стрельба, F/ENTER-циклическая смена оружия",50 - camera.x,30 - camera.y);
 		}
-	
+	*/
 }
  
 function gameover(){
+	alert("Game Over");
 	camera.x = 0;
 	camera.y = 0;
 	startGame();

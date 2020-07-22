@@ -368,6 +368,7 @@ class Tetris extends Part{
 		}
 	}
 	start(){
+		alert("Управление стрелками, вверх: вращение, сниз: ускорение");
 		this.counter=-100;
 		this.maxCounter=60;
 		this.lineSmasher=0;

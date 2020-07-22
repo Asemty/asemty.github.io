@@ -59,11 +59,11 @@ function update(){
 	ctx.drawImage(img,0,0,8,8,40,60,80,80);*/
 	timer.draw();
 	if(monster.health <= 0){
-		alert("Congradulate, you win!" + (player.health == 100 ? "\nFlawless victory!" : ""))
+		alert("Congratulate, you win!" + (player.health == 100 ? "\nFlawless victory!" : ""))
 		gen();
 	}
 	if(player.health <= 0){
-		alert("Congradulate, you lose!" + (monster.health == 100 ? "\nFlawless lose!" : ""))
+		alert("Congratulate, you lose!" + (monster.health == 100 ? "\nFlawless lose!" : ""))
 		gen();
 	}
 }
@@ -87,7 +87,7 @@ function start(){
 }
 
 function gen(){
-	alert("Hello! \nuse 1 to attack (only in green zone) \nuse 2 to phisic defence \nuse 3 to magic defence")
+	alert("Hello! \nuse 1 to attack (only in the green zone) \nuse 2 to physical protection \nuse 3 to magic protection")
 	monster = {health: 100, attackPower: 5, maxTimer: 400, pic: enemy};
 	monster.behaviour = [];
 	monster.behaviour.push(vuln(4,7));

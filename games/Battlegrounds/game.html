@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<title>Name</title>
+<canvas id="cnv" width="1280" height="720"></canvas>
+<link rel = "stylesheet" type = "text/css" href = "../../defaultGameStyle.css">
+<script> //preload
+	preupdate = [];
+	postupdate = [];
+</script>
+<script src="../scripts/input.js"></script>
+<script src="field.js"></script>
+<script src="gameController.js"></script>
+<script src="main.js"></script>
+<script>
+window.onload=function() {
+    cnv = document.getElementById("cnv");
+    ctx = cnv.getContext("2d");
+	ctx.imageSmoothingEnabled = false;
+	start();
+    setInterval(update,1000/45);
+};
+function update(){
+	preupdate.forEach((fun)=>{fun()});
+	step();
+	draw();
+	postupdate.forEach((fun)=>{fun()});
+}
+</script>

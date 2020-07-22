@@ -1,4 +1,4 @@
-(function(data){
+﻿(function(data){
 	gameData = data;
 })(
 	[

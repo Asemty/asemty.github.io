@@ -113,6 +113,8 @@ function isCollide(ent1, ent2){
 	return Math.hypot(ent1.x - ent2.x, ent1.y - ent2.y) < (ent1.radius + ent2.radius) * p.tile / 16;
 }
 function start(){
+	
+	alert("Стрелки: движение \nx: стрельба, z: поворот оружия")
 	mouse = {x: 0, y: 0};
 	buttons = [];
 	buttons.push({id: 37, name: "left", isPressed: false});
