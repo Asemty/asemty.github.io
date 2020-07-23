@@ -1,16 +1,19 @@
 Input = {}
-Input.init = function(){//Эта функция вызывается автоматически в конце файла
+Input.init = function(){
+	this.mouse = {x: 0, y: 0};
+	this.buttons = [];
+	
+	this.cnv = document.getElementById("cnv");
+	
 	document.addEventListener("keydown",(evt) => {Input.keyDownUp(evt)});
 	document.addEventListener("keyup",(evt) => {Input.keyDownUp(evt)});
-	var cnv = document.getElementById("cnv");// использование canvas'а с именем "cnv" берётся по умолчанию. Так же используется в mouseMove
 	cnv.addEventListener("contextmenu", (event) => {event.preventDefault();});//выключаем стандартное действие
 	cnv.onmousemove = (evt) => {Input.mouseMove(evt)};
 	cnv.onmouseup = (evt) => {Input.mouseDownUp(evt)};
 	cnv.onmousedown = (evt) => {Input.mouseDownUp(evt)};
 	if(postupdate)postupdate.push(() => {Input.update()});//этот код должен выполняться после каждой стандартной итеррации цикла 
 	
-	this.mouse = {x: 0, y: 0};//храним координаты мыши. закрывать запись нет смысла, они обновляются при каждом сдвиге
-	this.buttons = [];
+	
 	this.addKey(1000, "lmb");//импользуем id не существующих кнопок для мыши.
 	this.addKey(1001, "cmb");
 	this.addKey(1002, "rmb");
